@@ -1,11 +1,15 @@
+// main.go
 package main
 
 import (
 	_ "cat-connect/routers"
-	beego "github.com/beego/beego/v2/server/web"
+
+	"github.com/beego/beego/v2/server/web"
 )
 
 func main() {
-	beego.Run()
+	web.BConfig.WebConfig.ViewsPath = "views"
+	web.BConfig.WebConfig.StaticDir["/static"] = "static"
+	web.BConfig.WebConfig.Session.SessionOn = true
+	web.Run()
 }
-
