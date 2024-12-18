@@ -1,0 +1,25 @@
+w3e12@w3e12:~/Desktop/a-9$ go version
+go version go1.23.2 linux/amd64
+w3e12@w3e12:~/Desktop/a-9$ go install github.com/beego/bee/v2@latest
+w3e12@w3e12:~/Desktop/a-9$ echo "export PATH=\$PATH:\$(go env GOPATH)/bin" >> ~/.bashrc
+w3e12@w3e12:~/Desktop/a-9$ source ~/.bashrc
+w3e12@w3e12:~/Desktop/a-9$ bee version
+2024/12/18 12:34:27.417 [D]  init global config instance failed. If you do not use this, just ignore it.  open conf/app.conf: no such file or directory
+2024/12/18 12:34:27 INFO     ▶ 0001 Getting bee latest version...
+2024/12/18 12:34:27 INFO     ▶ 0002 Your bee are up to date
+______
+| ___ \
+| |_/ /  ___   ___
+| ___ \ / _ \ / _ \
+| |_/ /|  __/|  __/
+\____/  \___| \___| v2.3.0
+
+├── GoVersion : go1.23.2
+├── GOOS      : linux
+├── GOARCH    : amd64
+├── NumCPU    : 4
+├── GOPATH    : 
+├── GOROOT    : /usr/local/go
+├── Compiler  : gc
+└── Date      : Wednesday, 18 Dec 2024
+w3e12@w3e12:~/Desktop/a-9$

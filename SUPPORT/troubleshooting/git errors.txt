@@ -1,0 +1,55 @@
+w3e12@w3e12:~/go/src/github.com/nadim-workspace/cat-api$ git add .
+w3e12@w3e12:~/go/src/github.com/nadim-workspace/cat-api$ git commit -m"Install Beego Framework"
+[master 4440e0a] Install Beego Framework
+ 14 files changed, 327 insertions(+)
+ create mode 100644 SUPPORT/Project Structure.txt
+ rename {troubleshooting => SUPPORT/troubleshooting}/1st step errors.txt (100%)
+ rename {troubleshooting => SUPPORT/troubleshooting}/2nd step Successful.txt (100%)
+ rename {troubleshooting => SUPPORT/troubleshooting}/3rd step successfully run cat-api (beego) project.txt (100%)
+ create mode 100755 cat-api
+ create mode 100644 conf/app.conf
+ create mode 100644 controllers/default.go
+ create mode 100644 go.mod
+ create mode 100644 go.sum
+ create mode 100644 main.go
+ create mode 100644 routers/router.go
+ create mode 100644 static/js/reload.min.js
+ create mode 100644 tests/default_test.go
+ create mode 100644 views/index.tpl
+w3e12@w3e12:~/go/src/github.com/nadim-workspace/cat-api$ git push
+fatal: No configured push destination.
+Either specify the URL from the command-line or configure a remote repository using
+
+    git remote add <name> <url>
+
+and then push using the remote name
+
+    git push <name>
+
+w3e12@w3e12:~/go/src/github.com/nadim-workspace/cat-api$ git remote add cat-api https://github.com/aa-nadim/cat-api.git
+w3e12@w3e12:~/go/src/github.com/nadim-workspace/cat-api$ git push cat-api
+fatal: The current branch master has no upstream branch.
+To push the current branch and set the remote as upstream, use
+
+    git push --set-upstream cat-api master
+
+To have this happen automatically for branches without a tracking
+upstream, see 'push.autoSetupRemote' in 'git help config'.
+
+w3e12@w3e12:~/go/src/github.com/nadim-workspace/cat-api$ ^C
+w3e12@w3e12:~/go/src/github.com/nadim-workspace/cat-api$ git push --set-upstream cat-api master
+Enumerating objects: 23, done.
+Counting objects: 100% (23/23), done.
+Delta compression using up to 4 threads
+Compressing objects: 100% (13/13), done.
+Writing objects: 100% (21/21), 9.59 MiB | 366.00 KiB/s, done.
+Total 21 (delta 1), reused 0 (delta 0), pack-reused 0
+remote: Resolving deltas: 100% (1/1), done.
+remote: 
+remote: Create a pull request for 'master' on GitHub by visiting:
+remote:      https://github.com/aa-nadim/cat-api/pull/new/master
+remote: 
+To https://github.com/aa-nadim/cat-api.git
+ * [new branch]      master -> master
+branch 'master' set up to track 'cat-api/master'.
+w3e12@w3e12:~/go/src/github.com/nadim-workspace/cat-api$ 

@@ -1,0 +1,80 @@
+w3e12@w3e12:~/Desktop/a-9/cat-api$ go install github.com/beego/bee/v2@latest
+go: downloading github.com/beego/bee/v2 v2.3.0
+go: downloading github.com/beego/bee v1.12.3
+go: downloading gopkg.in/yaml.v2 v2.4.0
+go: downloading github.com/fsnotify/fsnotify v1.4.9
+go: downloading github.com/go-delve/delve v1.20.2
+go: downloading github.com/gorilla/websocket v1.4.2
+go: downloading github.com/beego/beego/v2 v2.1.0
+go: downloading github.com/go-sql-driver/mysql v1.7.0
+go: downloading github.com/lib/pq v1.10.5
+go: downloading golang.org/x/tools v0.6.0
+go: downloading github.com/davecgh/go-spew v1.1.1
+go: downloading github.com/flosch/pongo2 v0.0.0-20200529170236-5abacdfa4915
+go: downloading github.com/pelletier/go-toml v1.9.2
+go: downloading github.com/smartwalle/pongo2render v1.0.1
+go: downloading github.com/spf13/viper v1.7.0
+go: downloading golang.org/x/sys v0.18.0
+go: downloading github.com/cosiner/argv v0.1.0
+go: downloading github.com/derekparker/trie v0.0.0-20221213183930-4c74548207f4
+go: downloading github.com/go-delve/liner v1.2.3-0.20220127212407-d32d89dd2a5d
+go: downloading github.com/mattn/go-isatty v0.0.3
+go: downloading github.com/pkg/errors v0.9.1
+go: downloading github.com/shiena/ansicolor v0.0.0-20200904210342-c7312218db18
+go: downloading github.com/hashicorp/golang-lru v0.5.4
+go: downloading github.com/prometheus/client_golang v1.15.1
+go: downloading golang.org/x/crypto v0.21.0
+go: downloading google.golang.org/protobuf v1.33.0
+go: downloading github.com/hashicorp/hcl v1.0.0
+go: downloading github.com/magiconair/properties v1.8.1
+go: downloading github.com/mitchellh/mapstructure v1.5.0
+go: downloading github.com/spf13/afero v1.1.2
+go: downloading github.com/spf13/cast v1.3.0
+go: downloading github.com/spf13/jwalterweatherman v1.0.0
+go: downloading github.com/spf13/pflag v1.0.5
+go: downloading github.com/subosito/gotenv v1.2.0
+go: downloading gopkg.in/ini.v1 v1.51.0
+go: downloading go.starlark.net v0.0.0-20220816155156-cfacd8902214
+go: downloading github.com/sirupsen/logrus v1.6.0
+go: downloading github.com/google/go-dap v0.7.0
+go: downloading golang.org/x/arch v0.0.0-20190927153633-4e8777c89be4
+go: downloading github.com/mattn/go-runewidth v0.0.13
+go: downloading gopkg.in/yaml.v3 v3.0.1
+go: downloading github.com/prometheus/client_model v0.3.0
+go: downloading github.com/prometheus/common v0.42.0
+go: downloading golang.org/x/mod v0.8.0
+go: downloading golang.org/x/net v0.23.0
+go: downloading golang.org/x/text v0.14.0
+go: downloading github.com/cilium/ebpf v0.7.0
+go: downloading github.com/rivo/uniseg v0.2.0
+go: downloading github.com/beorn7/perks v1.0.1
+go: downloading github.com/cespare/xxhash/v2 v2.2.0
+go: downloading github.com/prometheus/procfs v0.9.0
+go: downloading github.com/golang/protobuf v1.5.3
+go: downloading github.com/matttproud/golang_protobuf_extensions v1.0.4
+w3e12@w3e12:~/Desktop/a-9/cat-api$ bee run
+Command 'bee' not found, did you mean:
+  command 'beef' from deb beef (1.2.0-2)
+  command 'b1ee' from deb bluez-tests (5.70-0ubuntu3)
+  command 'beep' from deb beep (1.4.9-1build1)
+  command 'ree' from deb ree (1.4.1-2)
+  command 'beet' from deb beets (1.6.0-7)
+  command 'ben' from deb ben (0.10.3ubuntu2)
+  command 'pee' from deb moreutils (0.67-1)
+  command 'bbe' from deb bbe (0.2.2-5)
+  command 'see' from deb mailcap (3.70+nmu1ubuntu1)
+  command 'tee' from deb coreutils (9.4-2ubuntu2)
+Try: apt install <deb name>
+w3e12@w3e12:~/Desktop/a-9/cat-api$ bee version
+Command 'bee' not found, did you mean:
+  command 'bbe' from deb bbe (0.2.2-5)
+  command 'ben' from deb ben (0.10.3ubuntu2)
+  command 'beep' from deb beep (1.4.9-1build1)
+  command 'see' from deb mailcap (3.70+nmu1ubuntu1)
+  command 'pee' from deb moreutils (0.67-1)
+  command 'tee' from deb coreutils (9.4-2ubuntu2)
+  command 'beet' from deb beets (1.6.0-7)
+  command 'beef' from deb beef (1.2.0-2)
+  command 'b1ee' from deb bluez-tests (5.70-0ubuntu3)
+  command 'ree' from deb ree (1.4.1-2)
+Try: apt install <deb name>

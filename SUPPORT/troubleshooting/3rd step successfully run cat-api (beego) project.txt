@@ -1,0 +1,140 @@
+w3e12@w3e12:~/Desktop/a-9$ mkdir -p ~/go/src/github.com/cat-api
+w3e12@w3e12:~/Desktop/a-9$ cd ~/go/src/github.com/cat-api
+w3e12@w3e12:~/go/src/github.com/cat-api$ rm -rf ~/go/src/github.com/cat-api
+w3e12@w3e12:~/go/src/github.com/cat-api$ cd ..
+w3e12@w3e12:~/go/src/github.com$ rm -rf ~/go/src/github.com/cat-api
+w3e12@w3e12:~/go/src/github.com$ ls
+w3e12@w3e12:~/go/src/github.com$ mkdir -p ~/go/src/github.com/nadim-workspace
+w3e12@w3e12:~/go/src/github.com$ ls
+nadim-workspace
+w3e12@w3e12:~/go/src/github.com$ cd ~/go/src/github.com/nadim-workspace
+w3e12@w3e12:~/go/src/github.com/nadim-workspace$ bee new cat-api
+2024/12/18 12:45:19.244 [D]  init global config instance failed. If you do not use this, just ignore it.  open conf/app.conf: no such file or directory
+2024/12/18 12:45:19 INFO     ▶ 0001 Generate new project support go modules.
+2024/12/18 12:45:19 INFO     ▶ 0002 Creating application...
+        create   /home/w3e12/go/src/github.com/nadim-workspace/cat-api/go.mod
+        create   /home/w3e12/go/src/github.com/nadim-workspace/cat-api/
+        create   /home/w3e12/go/src/github.com/nadim-workspace/cat-api/conf/
+        create   /home/w3e12/go/src/github.com/nadim-workspace/cat-api/controllers/
+        create   /home/w3e12/go/src/github.com/nadim-workspace/cat-api/models/
+        create   /home/w3e12/go/src/github.com/nadim-workspace/cat-api/routers/
+        create   /home/w3e12/go/src/github.com/nadim-workspace/cat-api/tests/
+        create   /home/w3e12/go/src/github.com/nadim-workspace/cat-api/static/
+        create   /home/w3e12/go/src/github.com/nadim-workspace/cat-api/static/js/
+        create   /home/w3e12/go/src/github.com/nadim-workspace/cat-api/static/css/
+        create   /home/w3e12/go/src/github.com/nadim-workspace/cat-api/static/img/
+        create   /home/w3e12/go/src/github.com/nadim-workspace/cat-api/views/
+        create   /home/w3e12/go/src/github.com/nadim-workspace/cat-api/conf/app.conf
+        create   /home/w3e12/go/src/github.com/nadim-workspace/cat-api/controllers/default.go
+        create   /home/w3e12/go/src/github.com/nadim-workspace/cat-api/views/index.tpl
+        create   /home/w3e12/go/src/github.com/nadim-workspace/cat-api/routers/router.go
+        create   /home/w3e12/go/src/github.com/nadim-workspace/cat-api/tests/default_test.go
+        create   /home/w3e12/go/src/github.com/nadim-workspace/cat-api/main.go
+2024/12/18 12:45:19 SUCCESS  ▶ 0003 New application successfully created!
+w3e12@w3e12:~/go/src/github.com/nadim-workspace$ cd cat-api
+w3e12@w3e12:~/go/src/github.com/nadim-workspace/cat-api$ bee run
+______
+| ___ \
+| |_/ /  ___   ___
+| ___ \ / _ \ / _ \
+| |_/ /|  __/|  __/
+\____/  \___| \___| v2.3.0
+2024/12/18 12:46:09 WARN     ▶ 0001 Running application outside of GOPATH
+2024/12/18 12:46:09 INFO     ▶ 0002 Using 'cat-api' as 'appname'
+2024/12/18 12:46:09 INFO     ▶ 0003 Initializing watcher...
+controllers/default.go:4:2: missing go.sum entry for module providing package github.com/beego/beego/v2/server/web (imported by cat-api); to add:
+        go get cat-api
+2024/12/18 12:46:10 ERROR    ▶ 0004 Failed to build the application: controllers/default.go:4:2: missing go.sum entry for module providing package github.com/beego/beego/v2/server/web (imported by cat-api); to add:
+        go get cat-api
+
+^C
+w3e12@w3e12:~/go/src/github.com/nadim-workspace/cat-api$ export GO111MODULE=on
+w3e12@w3e12:~/go/src/github.com/nadim-workspace/cat-api$ go mod init cat-api
+go: /home/w3e12/go/src/github.com/nadim-workspace/cat-api/go.mod already exists
+w3e12@w3e12:~/go/src/github.com/nadim-workspace/cat-api$ go mod tidy
+go: downloading github.com/smartystreets/goconvey v1.6.4
+go: downloading github.com/stretchr/testify v1.8.1
+go: downloading golang.org/x/crypto v0.0.0-20220315160706-3147a52a75dd
+go: downloading google.golang.org/protobuf v1.30.0
+go: downloading github.com/elazarl/go-bindata-assetfs v1.0.1
+go: downloading github.com/jtolds/gls v4.20.0+incompatible
+go: downloading github.com/smartystreets/assertions v0.0.0-20180927180507-b2de0cb4f26d
+go: downloading github.com/pmezard/go-difflib v1.0.0
+go: downloading github.com/gopherjs/gopherjs v0.0.0-20181017120253-0766667cb4d1
+go: downloading golang.org/x/sys v0.6.0
+go: downloading golang.org/x/net v0.7.0
+go: downloading golang.org/x/text v0.7.0
+go: downloading github.com/google/go-cmp v0.5.9
+go: downloading gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c
+go: downloading github.com/kr/pretty v0.3.1
+go: downloading github.com/rogpeppe/go-internal v1.10.0
+go: finding module for package github.com/kr/text
+go: downloading github.com/kr/text v0.2.0
+go: found github.com/kr/text in github.com/kr/text v0.2.0
+w3e12@w3e12:~/go/src/github.com/nadim-workspace/cat-api$ bee run
+______
+| ___ \
+| |_/ /  ___   ___
+| ___ \ / _ \ / _ \
+| |_/ /|  __/|  __/
+\____/  \___| \___| v2.3.0
+2024/12/18 12:49:32 WARN     ▶ 0001 Running application outside of GOPATH
+2024/12/18 12:49:32 INFO     ▶ 0002 Using 'cat-api' as 'appname'
+2024/12/18 12:49:32 INFO     ▶ 0003 Initializing watcher...
+google.golang.org/protobuf/internal/flags
+google.golang.org/protobuf/internal/set
+google.golang.org/protobuf/internal/pragma
+golang.org/x/text/transform
+golang.org/x/sys/unix
+google.golang.org/protobuf/internal/detrand
+google.golang.org/protobuf/internal/errors
+google.golang.org/protobuf/internal/version
+golang.org/x/crypto/acme
+golang.org/x/text/unicode/bidi
+google.golang.org/protobuf/encoding/protowire
+google.golang.org/protobuf/reflect/protoreflect
+golang.org/x/text/secure/bidirule
+golang.org/x/text/unicode/norm
+google.golang.org/protobuf/internal/genid
+google.golang.org/protobuf/internal/encoding/messageset
+google.golang.org/protobuf/internal/order
+google.golang.org/protobuf/internal/strs
+google.golang.org/protobuf/reflect/protoregistry
+google.golang.org/protobuf/runtime/protoiface
+google.golang.org/protobuf/internal/encoding/text
+google.golang.org/protobuf/proto
+google.golang.org/protobuf/internal/encoding/defval
+google.golang.org/protobuf/internal/descfmt
+google.golang.org/protobuf/internal/descopts
+golang.org/x/net/idna
+github.com/beego/beego/v2/server/web/context
+google.golang.org/protobuf/encoding/prototext
+google.golang.org/protobuf/internal/filedesc
+github.com/prometheus/procfs
+golang.org/x/crypto/acme/autocert
+github.com/beego/beego/v2/server/web/context/param
+google.golang.org/protobuf/internal/encoding/tag
+google.golang.org/protobuf/internal/impl
+google.golang.org/protobuf/internal/filetype
+google.golang.org/protobuf/runtime/protoimpl
+google.golang.org/protobuf/types/known/timestamppb
+google.golang.org/protobuf/types/descriptorpb
+github.com/golang/protobuf/ptypes/timestamp
+google.golang.org/protobuf/reflect/protodesc
+github.com/golang/protobuf/proto
+github.com/matttproud/golang_protobuf_extensions/pbutil
+github.com/prometheus/client_model/go
+github.com/prometheus/client_golang/prometheus/internal
+github.com/prometheus/common/expfmt
+github.com/prometheus/client_golang/prometheus
+github.com/prometheus/client_golang/prometheus/promhttp
+github.com/beego/beego/v2/server/web
+cat-api/controllers
+cat-api/routers
+cat-api
+2024/12/18 12:49:41 SUCCESS  ▶ 0004 Built Successfully!
+2024/12/18 12:49:41 INFO     ▶ 0005 Restarting 'cat-api'...
+2024/12/18 12:49:41 SUCCESS  ▶ 0006 './cat-api' is running...
+2024/12/18 12:49:41.768 [I] [server.go:281]  http server Running on http://:8080
+2024/12/18 12:49:53.917 [D] [router.go:1305]  |            ::1| 200 |  13.962998ms|   match| GET      /     r:/
+2024/12/18 12:49:53.998 [D] [router.go:1305]  |            ::1| 200 |     277.18µs|   match| GET      /static/js/reload.min.js
