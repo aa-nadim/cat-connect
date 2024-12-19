@@ -33,3 +33,20 @@ func (c *FavsController) GetFavorites() {
 	c.Data["json"] = json.RawMessage(resp)
 	c.ServeJSON()
 }
+
+func (c *FavsController) DeleteFavorite() {
+	apiKey, _ := web.AppConfig.String("APIKey")
+	favoriteID := c.Ctx.Input.Param(":favorite_id")
+
+	url := fmt.Sprintf("https://api.thecatapi.com/v1/favourites/%s", favoriteID)
+	resp, err := utils.MakeRequest("DELETE", url, apiKey, nil)
+	if err != nil {
+		c.Ctx.Output.SetStatus(500)
+		c.Data["json"] = map[string]string{"error": err.Error()}
+		c.ServeJSON()
+		return
+	}
+
+	c.Data["json"] = json.RawMessage(resp)
+	c.ServeJSON()
+}

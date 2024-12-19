@@ -12,7 +12,9 @@ func init() {
 	// API routes
 	beego.Router("/api/breeds", &controllers.BreedsController{}, "get:GetBreeds")
 	beego.Router("/api/breeds/:id", &controllers.BreedsController{}, "get:GetBreedImages")
-	beego.Router("/api/favorites", &controllers.FavsController{}, "get:GetFavorites")
+
 	beego.Router("/api/favorites", &controllers.VotingController{}, "post:AddFavorite")
-	beego.Router("/api/favorites/:favorite_id", &controllers.VotingController{}, "delete:DeleteFavorite")
+
+	beego.Router("/api/favorites", &controllers.FavsController{}, "get:GetFavorites")
+	beego.Router("/api/favorites/:favorite_id", &controllers.FavsController{}, "delete:DeleteFavorite")
 }

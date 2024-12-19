@@ -3,7 +3,6 @@ package controllers
 import (
 	"cat-connect/utils"
 	"encoding/json"
-	"fmt"
 
 	"github.com/beego/beego/v2/server/web"
 )
@@ -45,23 +44,6 @@ func (c *VotingController) AddFavorite() {
 	}
 
 	resp, err := utils.MakeRequest("POST", "https://api.thecatapi.com/v1/favourites", apiKey, body)
-	if err != nil {
-		c.Ctx.Output.SetStatus(500)
-		c.Data["json"] = map[string]string{"error": err.Error()}
-		c.ServeJSON()
-		return
-	}
-
-	c.Data["json"] = json.RawMessage(resp)
-	c.ServeJSON()
-}
-
-func (c *VotingController) DeleteFavorite() {
-	apiKey, _ := web.AppConfig.String("APIKey")
-	favoriteID := c.Ctx.Input.Param(":favorite_id")
-
-	url := fmt.Sprintf("https://api.thecatapi.com/v1/favourites/%s", favoriteID)
-	resp, err := utils.MakeRequest("DELETE", url, apiKey, nil)
 	if err != nil {
 		c.Ctx.Output.SetStatus(500)
 		c.Data["json"] = map[string]string{"error": err.Error()}
