@@ -1,0 +1,22 @@
+w3e12@w3e12:~/go/src/cat-connect$ curl -X POST "https://api.thecatapi.com/v1/favourites" \
+-H "x-api-key: live_rtO7Nhjpuo0DmEaWTsE0J41ytL3FlYxLkJbSZNDG557WGS09hgLR2w0rjAWyNO5m" \
+-H "Content-Type: application/json" \
+-d '{"image_id": "p6x60nX6U", "sub_id": "user-123"}'
+{"message":"SUCCESS","id":23250420curl -X POST "https://api.thecatapi.com/v1/favourites" \//api.thecatapi.com/v1/favourites" \
+-H "x-api-key: live_rtO7Nhjpuo0DmEaWTsE0J41ytL3FlYxLkJbSZNDG557WGS09hgLR2w0rjAWyNO5m" \
+-H "Content-Type: application/json" \
+-d '{"image_id": "p6x60nX6U", "sub_id": "user-123"}'
+DUPLICATE_FAVOURITE - favourites are unique for account + image_id + sub_idw3e12@w3e12:~/go/src/cat-connect$ 
+w3e12@w3e12:~/go/src/cat-connect$ 
+w3e12@w3e12:~/go/src/cat-connect$ curl -X POST "https://api.thecatapi.com/v1/favourites" -H "x-api-key: live_rtO7Nhjpuo0DmEaWTsE0J41ytL3FlYxLkJbSZNDG557WGS09hgLR2w0rjAWyNO5m" -H "Content-Type: application/json" -d '{"image_id": "p6x60nX6U", "sub_id": "user-123"}'
+w3e12@w3e12:~/go/src/cat-connect$ curl -X POST "https://api.thecatapi.com/v1/favourites" \
+-H "x-api-key: live_rtO7Nhjpuo0DmEaWTsE0J41ytL3FlYxLkJbSZNDG557WGS09hgLR2w0rjAWyNO5m" \
+-H "Content-Type: application/json" \
+-d '{"image_id": "p6x60nX6U", "sub_id": "user-123"}'
+DUPLICATE_FAVOURITE - favourites are unique for account + image_id + sub_idw3e12@w3e12:~/go/src/cat-connect$ curl -X GET "https://api.thecatapi.com/v1/favourites?limit=20&sub_id=user-123&order=DESC" \   curl -X GET "https://api.thecatapi.com/v1/favourites?limit=20&sub_id=user-123&order=DESC" \
+-H "content-type: application/json" \
+-H "x-api-key: live_rtO7Nhjpuo0DmEaWTsE0J41ytL3FlYxLkJbSZNDG557WGS09hgLR2w0rjAWyNO5m"
+[{"id":232504205,"user_id":"oyv8u2","image_id":"p6x60nX6U","sub_id":"user-123","created_at":"2024-12-19T12:10:07.000Z","image":{"id":"p6x60nX6U","url":"https://cdn2.thecatapi.com/images/p6x60nX6U.jpg"}}]w3e12@w3e12:~/go/src/cat-connect$ 
+w3e12@w3e12:~/go/src/cat-connect$ curl -X DELETE "https://api.thecatapi.com/v1/favourites/p6x60nX6U" \
+-H "x-api-key: live_rtO7Nhjpuo0DmEaWTsE0J41ytL3FlYxLkJbSZNDG557WGS09hgLR2w0rjAWyNO5m"
+INVALID_ACCOUNTw3e12@w3e12:~/go/src/cat-connect$ 

@@ -3,7 +3,10 @@ document.addEventListener('DOMContentLoaded', function() {
     const breedShowcase = document.getElementById('breedShowcase');
     const carouselInner = document.querySelector('.carousel-inner');
     const indicators = document.querySelector('.carousel-indicators');
-    
+
+    // Static placeholder image
+    const placeholderImage = 'static/images/placeholder.jpg';
+
     // Store breed data globally
     let breedsData = {};
 
@@ -11,13 +14,19 @@ document.addEventListener('DOMContentLoaded', function() {
     fetch('/api/breeds')
         .then(response => response.json())
         .then(breeds => {
-            breeds.forEach(breed => {
+            breeds.forEach((breed, index) => {
                 breedsData[breed.id] = breed;
                 const option = document.createElement('option');
                 option.value = breed.id;
                 option.textContent = breed.name;
                 breedSelect.appendChild(option);
             });
+
+            // Automatically select the second option
+            if (breedSelect.options.length > 1) {
+                breedSelect.selectedIndex = 1; // Select second option
+                breedSelect.dispatchEvent(new Event('change')); // Trigger change event
+            }
         })
         .catch(error => console.error('Error loading breeds:', error));
 
@@ -34,11 +43,11 @@ document.addEventListener('DOMContentLoaded', function() {
         carouselInner.innerHTML = '<div class="text-center p-5">Loading...</div>';
 
         // Fetch images for selected breed
-        fetch(`/api/breeds/${breedId}`)  // Changed this line to match the router path
+        fetch(`/api/breeds/${breedId}`)
             .then(response => response.json())
             .then(images => {
-                if (images.error) {
-                    throw new Error(images.error);
+                if (images.error || images.length === 0) {
+                    throw new Error('No images found.');
                 }
 
                 // Clear existing carousel content
@@ -47,17 +56,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
                 // Add images to carousel
                 images.forEach((image, index) => {
-                    // Create carousel item
                     const item = document.createElement('div');
                     item.className = `carousel-item ${index === 0 ? 'active' : ''}`;
-                    
-                    // Make sure we're using the correct URL from the API response
-                    const imageUrl = image.url;
-                    if (!imageUrl) {
-                        console.error('No URL found in image object:', image);
-                        return;
-                    }
-
+                    const imageUrl = image.url || placeholderImage; // Use placeholder if no URL
                     item.innerHTML = `
                         <img src="${imageUrl}" class="d-block w-100" alt="Cat" 
                              style="height: 400px; object-fit: cover;">
@@ -96,10 +97,12 @@ document.addEventListener('DOMContentLoaded', function() {
             .catch(error => {
                 console.error('Error loading breed images:', error);
                 carouselInner.innerHTML = `
-                    <div class="alert alert-danger m-3">
-                        Error loading images. Please try again later.
+                    <div class="carousel-item active">
+                        <img src="${placeholderImage}" class="d-block w-100" alt="Placeholder" 
+                             style="height: 400px; object-fit: cover;">
                     </div>
                 `;
+                indicators.innerHTML = ''; // No indicators for placeholder
             });
     });
 });
