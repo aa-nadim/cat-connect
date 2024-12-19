@@ -1,94 +1,36 @@
-/* static/css/style.css */
-
-body {
-    background-color: #f0f2f5;
-}
-
-/* ----------------------------- */
-
-.menu-bar {
-    display: flex;
-    justify-content: center;
-    gap: 20px;
-    padding: 10px;
-    border-bottom: 1px solid #ddd;
-}
-.menu-item {
-    text-align: center;
-    color: #000;
-    text-decoration: none;
-    font-size: 14px;
-}
-.menu-item.active {
-    color: #FF4500; /* Highlighted color */
-    font-weight: bold;
-}
-.menu-item:hover {
-    color: #FF4500;
-}
-.menu-icon {
-    display: block;
-    font-size: 20px;
-    margin-bottom: 5px;
-}
-
-/* ----------------------------------- */
-
-.container {
-    padding: 20px;
-}
-   
-
-
-
-.cat-showcase {
- max-width: 800px;
- margin: 0 auto;
- background: white;
- padding: 20px;
- border-radius: 10px;
- box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+.breeds-container,
+.voting-container,
+.favs-container {
+    max-width: 800px;
+    margin: 0 auto;
 }
 
 .carousel-item img {
- width: 100%;
- height: 400px;
- object-fit: cover;
- border-radius: 8px;
+    width: 100%;
+    height: 400px;
+    object-fit: cover;
 }
 
-.breed-info {
- padding: 20px;
- background: #f8f9fa;
- border-radius: 8px;
- margin-top: 20px;
+.voting-container .card {
+    max-width: 500px;
+    margin: 0 auto;
 }
 
-.navigation-buttons button {
- margin: 0 5px;
- width: 40px;
- height: 40px;
- border-radius: 50%;
- padding: 0;
+.voting-container .card-img-top {
+    height: 400px;
+    object-fit: cover;
 }
 
-.breed-selector {
- width: 300px;
+.favs-container .fav-item {
+    margin-bottom: 20px;
 }
 
-#breedName {
- color: #2c3e50;
- margin-bottom: 15px;
+.favs-container .fav-item img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
 }
 
-#breedDescription {
- color: #34495e;
- line-height: 1.6;
+.view-controls {
+    text-align: right;
 }
-
-#breedOrigin {
- color: #7f8c8d;
- font-style: italic;
-}
-
-

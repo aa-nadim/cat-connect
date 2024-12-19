@@ -1,25 +1,34 @@
-// controllers/default.go
+// controllers/breeds.go
 package controllers
 
 import (
 	"cat-connect/models"
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 
 	"github.com/beego/beego/v2/server/web"
 )
 
-type MainController struct {
+type BreedsController struct {
 	web.Controller
 }
 
-func (c *MainController) Get() {
-	c.Data["Website"] = "Cat Connect"
-	c.TplName = "index.tpl"
+type Breed struct {
+	ID           string `json:"id"`
+	Name         string `json:"name"`
+	Origin       string `json:"origin"`
+	Description  string `json:"description"`
+	WikipediaURL string `json:"wikipedia_url"`
 }
 
-func (c *MainController) GetBreeds() {
+func (c *BreedsController) Get() {
+	c.Layout = "layout.html"
+	c.TplName = "breeds.html"
+}
+
+func (c *BreedsController) GetBreeds() {
 	apiKey := "live_rtO7Nhjpuo0DmEaWTsE0J41ytL3FlYxLkJbSZNDG557WGS09hgLR2w0rjAWyNO5m" // Replace with your actual API key
 
 	breedChan := make(chan []models.Breed)
@@ -66,22 +75,22 @@ func (c *MainController) GetBreeds() {
 	c.ServeJSON()
 }
 
-func (c *MainController) GetBreedImages() {
-	breedId := c.GetString("breed_id")
-	if breedId == "" {
+func (c *BreedsController) GetBreedImages() {
+	breedID := c.Ctx.Input.Param(":id") // Change this line
+	if breedID == "" {
 		c.Data["json"] = map[string]string{"error": "breed_id is required"}
 		c.ServeJSON()
 		return
 	}
 
-	apiKey := "live_rtO7Nhjpuo0DmEaWTsE0J41ytL3FlYxLkJbSZNDG557WGS09hgLR2w0rjAWyNO5m" // Replace with your actual API key
+	apiKey := "live_rtO7Nhjpuo0DmEaWTsE0J41ytL3FlYxLkJbSZNDG557WGS09hgLR2w0rjAWyNO5m"
 
 	imageChan := make(chan []models.CatImage)
 	errChan := make(chan error)
 
 	go func() {
 		client := &http.Client{}
-		url := "https://api.thecatapi.com/v1/images/search?breed_ids=" + breedId + "&limit=5"
+		url := fmt.Sprintf("https://api.thecatapi.com/v1/images/search?breed_ids=%s&limit=5", breedID)
 		req, err := http.NewRequest("GET", url, nil)
 		if err != nil {
 			errChan <- err

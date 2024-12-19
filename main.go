@@ -1,4 +1,3 @@
-// main.go
 package main
 
 import (
@@ -8,8 +7,5 @@ import (
 )
 
 func main() {
-	web.BConfig.WebConfig.ViewsPath = "views"
-	web.BConfig.WebConfig.StaticDir["/static"] = "static"
-	web.BConfig.WebConfig.Session.SessionOn = true
 	web.Run()
 }
