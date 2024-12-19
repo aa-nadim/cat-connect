@@ -90,7 +90,8 @@ func (c *BreedsController) GetBreedImages() {
 
 	go func() {
 		client := &http.Client{}
-		url := fmt.Sprintf("https://api.thecatapi.com/v1/images/search?breed_ids=%s&limit=5", breedID)
+		url := fmt.Sprintf("https://api.thecatapi.com/v1/images/search?breed_ids=%s&limit=2&api_key=%s", breedID, apiKey)
+		// println(url)
 		req, err := http.NewRequest("GET", url, nil)
 		if err != nil {
 			errChan <- err
