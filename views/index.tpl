@@ -1,13 +1,28 @@
-// views/index.tpl
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cat Connect</title>
-    <link href="/static/css/bootstrap.min.css" rel="stylesheet">
     <link href="/static/css/style.css" rel="stylesheet">
+    <link href="/static/css/bootstrap.min.css" rel="stylesheet">
+
+    <link href="/static/css/all.min.css" rel="stylesheet">
 </head>
 <body>
     <div class="container mt-4">
+        <div class="menu-bar">
+            <a href="#" class="menu-item bg-warning">
+                <i class="fas fa-arrow-up"></i> Voting
+            </a>
+            <a href="#" class="menu-item active bg-warning">
+                <i class="fas fa-search"></i> Breeds
+            </a>
+            <a href="#" class="menu-item bg-warning">
+                <i class="fas fa-heart"></i> Favs
+            </a>
+        </div>
+
         <div class="row">
             <div class="col-md-12">
                 <h1 class="text-center mb-4">Cat Connect</h1>
