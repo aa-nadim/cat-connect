@@ -9,29 +9,118 @@
     <link href="/static/css/style.css" rel="stylesheet">
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <nav class="navbar navbar-expand-lg navbar-light bg-light mb-4">
         <div class="container">
-            <a class="navbar-brand" href="/">Cat Connect</a>
-            <div class="navbar-nav">
-                <a class="nav-link" href="/voting">
-                    <i class="fas fa-arrow-up"></i>
-                    <i class="fas fa-arrow-down"></i>
-                     Voting
-                </a>
-                <a class="nav-link" href="/breeds">
-                    <i class="fas fa-search"></i> Breeds
-                </a>
-                <a class="nav-link" href="/favs">
-                    <i class="fas fa-heart"></i> Favs
-                </a>
-            </div>
+            <h1 class="navbar-brand mb-0">Cat Connect</h1>
         </div>
     </nav>
 
-    <div class="container mt-4">
-        {{.LayoutContent}}
+    <div class="container">
+        <div class="text-center mb-4">
+            <div class="btn-group" role="group" aria-label="Navigation">
+                <button class="btn btn-outline-primary active" data-view="breeds">
+                    <i class="fas fa-search"></i> Breeds
+                </button>
+                <button class="btn btn-outline-primary" data-view="voting">
+                    <i class="fas fa-arrow-up"></i>
+                    <i class="fas fa-arrow-down"></i>
+                    Voting
+                </button>
+                <button class="btn btn-outline-primary" data-view="favs">
+                    <i class="fas fa-heart"></i> Favs
+                </button>
+            </div>
+        </div>
+
+        <div id="mainContent">
+            <div id="breedsView" class="view-content active">
+                <!-- Breeds content -->
+                <div class="breeds-container">
+                    <div class="search-container mb-4">
+                        <select class="form-select" id="breedSelect">
+                            <option value="">Select a breed</option>
+                        </select>
+                    </div>
+
+                    <div class="breed-showcase" id="breedShowcase" style="display: none;">
+                        <div id="breedCarousel" class="carousel slide" data-bs-ride="carousel">
+                            <div class="carousel-indicators"></div>
+                            <div class="carousel-inner"></div>
+                            <button class="carousel-control-prev" type="button" data-bs-target="#breedCarousel" data-bs-slide="prev">
+                                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                <span class="visually-hidden">Previous</span>
+                            </button>
+                            <button class="carousel-control-next" type="button" data-bs-target="#breedCarousel" data-bs-slide="next">
+                                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                <span class="visually-hidden">Next</span>
+                            </button>
+                        </div>
+
+                        <div class="breed-info mt-4">
+                            <h2 id="breedName"></h2>
+                            <h5 id="breedOrigin"></h5>
+                            <p id="breedDescription" class="mt-3"></p>
+                            <a id="wikiLink" href="#" target="_blank" class="btn btn-primary mt-2">Learn More on Wikipedia</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="votingView" class="view-content">
+                <!-- Voting content -->
+                <div class="voting-container">
+                    <div class="card voting-card">
+                        <div class="image-container">
+                            <img src="" id="currentImage" class="card-img-top voting-image" alt="Cat Image">
+                            <div class="loading-spinner d-none">
+                                <div class="spinner-border text-primary" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-body text-center">
+                            <div class="btn-group">
+                                <button class="btn btn-outline-danger" id="dislikeBtn">
+                                    <i class="fas fa-chevron-left"></i>
+                                </button>
+                                <button class="btn btn-outline-primary" id="loveBtn">
+                                    <i class="fas fa-heart"></i>
+                                </button>
+                                <button class="btn btn-outline-success" id="likeBtn">
+                                    <i class="fas fa-chevron-right"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="favsView" class="view-content">
+                <!-- Favs content -->
+                <div class="favs-container">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h2>My Favorites</h2>
+                        <div class="view-controls">
+                            <button class="btn btn-outline-primary active" id="gridView">
+                                <i class="fas fa-th"></i>
+                            </button>
+                            <button class="btn btn-outline-primary" id="listView">
+                                <i class="fas fa-list"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div id="favsGallery">
+                        <!-- Favorites will be dynamically inserted here -->
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/static/js/breeds.js"></script>
+    <script src="/static/js/voting.js"></script>
+    <script src="/static/js/favs.js"></script>
+    <script src="/static/js/main.js"></script>
 </body>
 </html>

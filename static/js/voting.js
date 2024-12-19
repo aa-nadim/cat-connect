@@ -9,28 +9,22 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentIndex = 0;
     const subID = 'user-123'; // You should generate this dynamically per user
 
-    // Show loading state
     function showLoading() {
         loadingSpinner.classList.remove('d-none');
         currentImage.style.opacity = '0.3';
+        setButtonsState(true);
     }
 
-    // Hide loading state
     function hideLoading() {
         loadingSpinner.classList.add('d-none');
         currentImage.style.opacity = '1';
+        setButtonsState(false);
     }
 
-    // Fetch images from the API
     async function fetchImages() {
         showLoading();
         try {
-            const response = await fetch('https://api.thecatapi.com/v1/images/search?limit=10', {
-                headers: {
-                    'x-api-key': 'your-api-key-here' // Replace with your actual API key
-                }
-            });
-            
+            const response = await fetch('https://api.thecatapi.com/v1/images/search?limit=10');
             if (!response.ok) {
                 throw new Error('Failed to fetch images');
             }
@@ -40,48 +34,37 @@ document.addEventListener('DOMContentLoaded', () => {
             await showCurrentImage();
         } catch (error) {
             console.error('Error fetching images:', error);
-            // Show error message to user
             alert('Failed to load images. Please try again.');
         } finally {
             hideLoading();
         }
     }
 
-    // Show current image with preloading
     async function showCurrentImage() {
-        if (images.length === 0) {
-            return;
-        }
+        if (images.length === 0) return;
 
         showLoading();
-
-        // Create a promise to handle image loading
-        const loadImage = () => {
-            return new Promise((resolve, reject) => {
+        try {
+            await new Promise((resolve, reject) => {
                 currentImage.onload = resolve;
                 currentImage.onerror = reject;
                 currentImage.src = images[currentIndex].url;
             });
-        };
-
-        try {
-            await loadImage();
+            preloadNextImage();
         } catch (error) {
             console.error('Error loading image:', error);
-            currentImage.src = 'path/to/fallback-image.jpg'; // Add a fallback image
+            currentImage.src = 'static/images/placeholder.jpg';
         } finally {
             hideLoading();
         }
     }
 
-    // Add to favorites
     async function addToFavorites(imageId) {
         try {
             const response = await fetch('/api/favorites', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json',
-                    'x-api-key': 'your-api-key-here' // Replace with your actual API key
+                    'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
                     image_id: imageId,
@@ -93,10 +76,28 @@ document.addEventListener('DOMContentLoaded', () => {
                 throw new Error('Failed to add to favorites');
             }
 
+            // Refresh favorites tab content
+            if (typeof refreshFavorites === 'function') {
+                refreshFavorites();
+            }
+
             return await response.json();
         } catch (error) {
             console.error('Error adding to favorites:', error);
             alert('Failed to add to favorites. Please try again.');
+        }
+    }
+
+    function setButtonsState(disabled) {
+        loveBtn.disabled = disabled;
+        likeBtn.disabled = disabled;
+        dislikeBtn.disabled = disabled;
+    }
+
+    function preloadNextImage() {
+        if (images.length > currentIndex + 1) {
+            const img = new Image();
+            img.src = images[currentIndex + 1].url;
         }
     }
 
@@ -107,7 +108,7 @@ document.addEventListener('DOMContentLoaded', () => {
             loveBtn.disabled = true;
             await addToFavorites(currentImage.id);
             loveBtn.disabled = false;
-            await fetchImages(); // Get new images after saving
+            await fetchImages();
         }
     });
 
@@ -123,21 +124,11 @@ document.addEventListener('DOMContentLoaded', () => {
         await showCurrentImage();
     });
 
-    // Disable buttons while loading
-    function setButtonsState(disabled) {
-        loveBtn.disabled = disabled;
-        likeBtn.disabled = disabled;
-        dislikeBtn.disabled = disabled;
-    }
-
-    // Preload next image
-    function preloadNextImage() {
-        if (images.length > currentIndex + 1) {
-            const img = new Image();
-            img.src = images[currentIndex + 1].url;
-        }
-    }
-
     // Initialize
     fetchImages();
 });
+
+// Export refresh function for tab switching
+window.refreshVoting = function() {
+    fetchImages();
+};

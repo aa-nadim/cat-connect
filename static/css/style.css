@@ -1,6 +1,14 @@
-.breeds-container,
-.voting-container,
-.favs-container {
+/* Common styles */
+.view-content {
+    display: none;
+}
+
+.view-content.active {
+    display: block;
+}
+
+/* Breeds styles */
+.breeds-container {
     max-width: 800px;
     margin: 0 auto;
 }
@@ -11,11 +19,10 @@
     object-fit: cover;
 }
 
-/* Voting Container Styles */
+/* Voting styles */
 .voting-container {
     max-width: 600px;
     margin: 0 auto;
-    padding: 20px;
 }
 
 .voting-card {
@@ -35,7 +42,6 @@
     width: 100%;
     height: 100%;
     object-fit: cover;
-    display: block;
 }
 
 .loading-spinner {
@@ -45,24 +51,15 @@
     transform: translate(-50%, -50%);
 }
 
-.btn-group {
-    gap: 10px;
-    margin-top: 15px;
+/* Favs styles */
+.favs-container {
+    max-width: 1200px;
+    margin: 0 auto;
 }
 
-.btn-group .btn {
-    padding: 10px 20px;
-    font-size: 1.2rem;
-}
-
-/* Hide spinner when image is loaded */
-.image-container:not(.loading) .loading-spinner {
-    display: none;
-}
-/* -------------------------- */
-/* Favorites page styles */
 .grid-view {
     display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
     gap: 1.5rem;
 }
 
@@ -70,22 +67,12 @@
     margin-bottom: 1.5rem;
 }
 
-.btn-outline-primary.active {
+.btn-group .btn {
+    padding: 10px 20px;
+}
+
+/* Navigation styles */
+.btn-group .btn.active {
     background-color: #0d6efd;
     color: white;
-}
-
-.view-controls {
-    margin-bottom: 2rem;
-}
-
-.view-controls .btn {
-    margin-right: 0.5rem;
-}
-
-/* Responsive adjustments */
-@media (max-width: 768px) {
-    .grid-view {
-        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-    }
 }

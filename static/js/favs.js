@@ -1,3 +1,16 @@
+let favoritesData = [];
+
+function initializeFavorites(initialFavorites) {
+    if (initialFavorites) {
+        favoritesData = initialFavorites;
+        displayFavorites('grid');
+    }
+}
+
+function refreshFavorites() {
+    loadFavorites();
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     const favsGallery = document.getElementById('favsGallery');
     const gridViewBtn = document.getElementById('gridView');
@@ -13,11 +26,12 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!response.ok) {
                 throw new Error('Failed to load favorites');
             }
-            const data = await response.json();
-            return data;
+            favoritesData = await response.json();
+            displayFavorites(favsGallery.classList.contains('grid-view') ? 'grid' : 'list');
         } catch (error) {
             console.error('Error loading favorites:', error);
-            return [];
+            favoritesData = [];
+            displayFavorites('grid');
         }
     }
 
@@ -29,8 +43,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!response.ok) {
                 throw new Error('Failed to delete favorite');
             }
-            // Refresh the display after successful deletion
-            displayFavorites(favsGallery.classList.contains('grid-view') ? 'grid' : 'list');
+            await loadFavorites();
             return true;
         } catch (error) {
             console.error('Error deleting favorite:', error);
@@ -38,25 +51,20 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    async function displayFavorites(viewType) {
-        const favorites = await loadFavorites();
-        
-        // Clear existing content
+    function displayFavorites(viewType) {
         favsGallery.innerHTML = '';
-        
-        // Set appropriate class based on view type
         favsGallery.className = viewType === 'grid' ? 'row grid-view g-4' : 'row list-view g-4';
 
-        if (favorites.length === 0) {
+        if (favoritesData.length === 0) {
             favsGallery.innerHTML = `
                 <div class="col-12 text-center">
-                    <p class="text-muted">No favorites yet. Go to the voting page to add some!</p>
+                    <p class="text-muted">No favorites yet. Add some from the voting section!</p>
                 </div>
             `;
             return;
         }
 
-        favorites.forEach(fav => {
+        favoritesData.forEach(fav => {
             const col = document.createElement('div');
             col.className = viewType === 'grid' ? 'col-md-4 col-sm-6' : 'col-12';
             
@@ -67,7 +75,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="card-body">
                         <div class="d-flex justify-content-between align-items-center">
                             <span class="text-muted">Added to favorites</span>
-                            <button class="btn btn-outline-danger btn-sm" onclick="deleteFavorite('${fav.id}')">
+                            <button class="btn btn-outline-danger btn-sm delete-favorite" data-id="${fav.id}">
                                 <i class="fas fa-trash"></i>
                             </button>
                         </div>
@@ -76,6 +84,14 @@ document.addEventListener('DOMContentLoaded', () => {
             `;
             
             favsGallery.appendChild(col);
+        });
+
+        // Add event listeners to delete buttons
+        document.querySelectorAll('.delete-favorite').forEach(btn => {
+            btn.addEventListener('click', async (e) => {
+                const favoriteId = e.currentTarget.dataset.id;
+                await deleteFavorite(favoriteId);
+            });
         });
     }
 
@@ -92,9 +108,12 @@ document.addEventListener('DOMContentLoaded', () => {
         displayFavorites('list');
     });
 
-    // Make deleteFavorite function available globally
-    window.deleteFavorite = deleteFavorite;
-
-    // Initial load in grid view
-    displayFavorites('grid');
+    // Initialize if no data loaded yet
+    if (favoritesData.length === 0) {
+        loadFavorites();
+    }
 });
+
+// Export functions for tab switching
+window.refreshFavorites = refreshFavorites;
+window.initializeFavorites = initializeFavorites;
