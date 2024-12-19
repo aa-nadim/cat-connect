@@ -1,16 +1,23 @@
 <div class="voting-container">
-    <div class="card">
-        <img src="" class="card-img-top" id="votingImage" alt="Cat Image">
+    <div class="card voting-card">
+        <div class="image-container">
+            <img src="" id="currentImage" class="card-img-top voting-image" alt="Cat Image">
+            <div class="loading-spinner d-none">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+            </div>
+        </div>
         <div class="card-body text-center">
             <div class="btn-group">
-                <button class="btn btn-outline-danger" id="prevBtn">
-                    <i class="fas fa-thumbs-down"></i>
+                <button class="btn btn-outline-danger" id="dislikeBtn">
+                    <i class="fas fa-chevron-left"></i>
                 </button>
                 <button class="btn btn-outline-primary" id="loveBtn">
                     <i class="fas fa-heart"></i>
                 </button>
-                <button class="btn btn-outline-success" id="nextBtn">
-                    <i class="fas fa-thumbs-up"></i>
+                <button class="btn btn-outline-success" id="likeBtn">
+                    <i class="fas fa-chevron-right"></i>
                 </button>
             </div>
         </div>

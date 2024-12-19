@@ -1,85 +1,100 @@
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', () => {
     const favsGallery = document.getElementById('favsGallery');
     const gridViewBtn = document.getElementById('gridView');
     const listViewBtn = document.getElementById('listView');
+    const subID = 'user-123'; // Should match the subID used in voting.js
 
-    function loadFavorites() {
-        const favorites = JSON.parse(localStorage.getItem('catFavorites') || '[]');
-        return favorites;
+    // Set initial active state
+    gridViewBtn.classList.add('active');
+
+    async function loadFavorites() {
+        try {
+            const response = await fetch(`/api/favorites?sub_id=${subID}`);
+            if (!response.ok) {
+                throw new Error('Failed to load favorites');
+            }
+            const data = await response.json();
+            return data;
+        } catch (error) {
+            console.error('Error loading favorites:', error);
+            return [];
+        }
     }
 
-    function displayGridView(favorites) {
-        favsGallery.innerHTML = '';
-        favsGallery.className = 'row g-4';
+    async function deleteFavorite(favoriteId) {
+        try {
+            const response = await fetch(`/api/favorites/${favoriteId}`, {
+                method: 'DELETE'
+            });
+            if (!response.ok) {
+                throw new Error('Failed to delete favorite');
+            }
+            // Refresh the display after successful deletion
+            displayFavorites(favsGallery.classList.contains('grid-view') ? 'grid' : 'list');
+            return true;
+        } catch (error) {
+            console.error('Error deleting favorite:', error);
+            return false;
+        }
+    }
+
+    async function displayFavorites(viewType) {
+        const favorites = await loadFavorites();
         
-        favorites.forEach(image => {
+        // Clear existing content
+        favsGallery.innerHTML = '';
+        
+        // Set appropriate class based on view type
+        favsGallery.className = viewType === 'grid' ? 'row grid-view g-4' : 'row list-view g-4';
+
+        if (favorites.length === 0) {
+            favsGallery.innerHTML = `
+                <div class="col-12 text-center">
+                    <p class="text-muted">No favorites yet. Go to the voting page to add some!</p>
+                </div>
+            `;
+            return;
+        }
+
+        favorites.forEach(fav => {
             const col = document.createElement('div');
-            col.className = 'col-md-4';
+            col.className = viewType === 'grid' ? 'col-md-4 col-sm-6' : 'col-12';
+            
             col.innerHTML = `
-                <div class="card">
-                    <img src="${image.url}" class="card-img-top" alt="Cat">
+                <div class="card h-100">
+                    <img src="${fav.image.url}" class="card-img-top" alt="Favorite Cat" 
+                         style="height: ${viewType === 'grid' ? '200px' : '300px'}; object-fit: cover;">
                     <div class="card-body">
-                        <button class="btn btn-sm btn-danger remove-fav" data-id="${image.id}">
-                            <i class="fas fa-trash"></i> Remove
-                        </button>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="text-muted">Added to favorites</span>
+                            <button class="btn btn-outline-danger btn-sm" onclick="deleteFavorite('${fav.id}')">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
                     </div>
                 </div>
             `;
+            
             favsGallery.appendChild(col);
         });
     }
 
-    function displayListView(favorites) {
-        favsGallery.innerHTML = '';
-        favsGallery.className = 'list-group';
-        
-        favorites.forEach(image => {
-            const item = document.createElement('div');
-            item.className = 'list-group-item d-flex align-items-center';
-            item.innerHTML = `
-                <img src="${image.url}" alt="Cat" style="width: 100px; height: 100px; object-fit: cover; margin-right: 15px;">
-                <button class="btn btn-sm btn-danger ms-auto remove-fav" data-id="${image.id}">
-                    <i class="fas fa-trash"></i> Remove
-                </button>
-            `;
-            favsGallery.appendChild(item);
-        });
-    }
-
-    function removeFavorite(imageId) {
-        const favorites = loadFavorites();
-        const updatedFavorites = favorites.filter(img => img.id !== imageId);
-        localStorage.setItem('catFavorites', JSON.stringify(updatedFavorites));
-        return updatedFavorites;
-    }
-
-    // Event listeners for view toggles
+    // Add click handlers for view toggles
     gridViewBtn.addEventListener('click', () => {
-        listViewBtn.classList.remove('active');
         gridViewBtn.classList.add('active');
-        displayGridView(loadFavorites());
+        listViewBtn.classList.remove('active');
+        displayFavorites('grid');
     });
 
     listViewBtn.addEventListener('click', () => {
-        gridViewBtn.classList.remove('active');
         listViewBtn.classList.add('active');
-        displayListView(loadFavorites());
+        gridViewBtn.classList.remove('active');
+        displayFavorites('list');
     });
 
-    // Event delegation for remove buttons
-    favsGallery.addEventListener('click', (e) => {
-        if (e.target.closest('.remove-fav')) {
-            const imageId = e.target.closest('.remove-fav').dataset.id;
-            const updatedFavorites = removeFavorite(imageId);
-            if (gridViewBtn.classList.contains('active')) {
-                displayGridView(updatedFavorites);
-            } else {
-                displayListView(updatedFavorites);
-            }
-        }
-    });
+    // Make deleteFavorite function available globally
+    window.deleteFavorite = deleteFavorite;
 
-    // Initial display
-    displayGridView(loadFavorites());
+    // Initial load in grid view
+    displayFavorites('grid');
 });
-
