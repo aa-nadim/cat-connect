@@ -118,5 +118,5 @@ func (c *HomeController) Get() {
 
 	c.Data["APIKey"] = apiKey
 	c.Data["InitialData"] = data
-	c.TplName = "home.html"
+	c.TplName = "layout.html"
 }
