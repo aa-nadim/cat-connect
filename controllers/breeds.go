@@ -25,7 +25,6 @@ type Breed struct {
 
 func (c *BreedsController) Get() {
 	c.Layout = "layout.html"
-	c.TplName = "breeds.html"
 }
 
 func (c *BreedsController) GetBreeds() {

@@ -14,7 +14,6 @@ type FavsController struct {
 
 func (c *FavsController) Get() {
 	c.Layout = "layout.html"
-	c.TplName = "favs.html"
 }
 
 func (c *FavsController) GetFavorites() {
