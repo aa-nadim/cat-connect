@@ -71,22 +71,33 @@ document.addEventListener('DOMContentLoaded', () => {
                     sub_id: subID
                 })
             });
-
+    
             if (!response.ok) {
-                throw new Error('Failed to add to favorites');
+                const errorData = await response.json();
+                console.error('Error:', errorData.error);
+                throw new Error('Failed to save favorite: ' + errorData.error);
             }
-
-            // Refresh favorites tab content
-            if (typeof refreshFavorites === 'function') {
-                refreshFavorites();
+    
+            const result = await response.json();
+    
+            // Move to next image after successful favorite
+            currentIndex = (currentIndex + 1) % images.length;
+            if (currentIndex === 0 || currentIndex === images.length - 3) {
+                // Fetch new images when near the end
+                await fetchImages();
+            } else {
+                await showCurrentImage();
             }
-
-            return await response.json();
+    
+            alert('Image added to favorites!');
+            return result;
         } catch (error) {
             console.error('Error adding to favorites:', error);
             alert('Failed to add to favorites. Please try again.');
+            throw error;
         }
     }
+    
 
     function setButtonsState(disabled) {
         loveBtn.disabled = disabled;
@@ -104,18 +115,26 @@ document.addEventListener('DOMContentLoaded', () => {
     // Event Listeners
     loveBtn.addEventListener('click', async () => {
         if (images.length > 0) {
-            const currentImage = images[currentIndex];
-            loveBtn.disabled = true;
-            await addToFavorites(currentImage.id);
-            loveBtn.disabled = false;
-            await fetchImages();
+            try {
+                loveBtn.disabled = true;
+                await addToFavorites(images[currentIndex].id);
+            } catch (error) {
+                console.log("i am here....",error);
+                alert('Failed to add to favorites.... Please try again.');
+            } finally {
+                loveBtn.disabled = false;
+            }
         }
     });
 
     likeBtn.addEventListener('click', async () => {
         if (images.length === 0) return;
         currentIndex = (currentIndex + 1) % images.length;
-        await showCurrentImage();
+        if (currentIndex === 0) {
+            await fetchImages();
+        } else {
+            await showCurrentImage();
+        }
     });
 
     dislikeBtn.addEventListener('click', async () => {

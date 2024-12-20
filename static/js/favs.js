@@ -89,6 +89,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Add event listeners to delete buttons
         document.querySelectorAll('.delete-favorite').forEach(btn => {
             btn.addEventListener('click', async (e) => {
+                e.stopPropagation(); // Prevent parent clicks
                 const favoriteId = e.currentTarget.dataset.id;
                 await deleteFavorite(favoriteId);
             });
@@ -106,6 +107,12 @@ document.addEventListener('DOMContentLoaded', () => {
         listViewBtn.classList.add('active');
         gridViewBtn.classList.remove('active');
         displayFavorites('list');
+    });
+
+    // Add click handler to refresh favorites when gallery is clicked
+    favsGallery.addEventListener('click', async (e) => {
+        e.stopPropagation(); // Ensure no interference
+        await loadFavorites();
     });
 
     // Initialize if no data loaded yet

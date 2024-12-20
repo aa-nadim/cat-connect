@@ -1,8 +1,10 @@
 package controllers
 
 import (
-	"cat-connect/utils"
+	"bytes"
 	"encoding/json"
+	"io/ioutil"
+	"net/http"
 
 	"github.com/beego/beego/v2/server/web"
 )
@@ -16,14 +18,6 @@ type FavoriteRequest struct {
 	SubID   string `json:"sub_id"`
 }
 
-func (c *VotingController) Get() {
-	apiKey, _ := web.AppConfig.String("APIKey")
-	c.Data["APIKey"] = apiKey
-
-	c.Layout = "layout.html"
-	c.TplName = "voting.html"
-}
-
 func (c *VotingController) AddFavorite() {
 	apiKey, _ := web.AppConfig.String("APIKey")
 
@@ -35,7 +29,13 @@ func (c *VotingController) AddFavorite() {
 		return
 	}
 
-	body, err := json.Marshal(req)
+	client := &http.Client{}
+	jsonBody, _ := json.Marshal(map[string]string{
+		"image_id": req.ImageID,
+		"sub_id":   req.SubID,
+	})
+
+	apiReq, err := http.NewRequest("POST", "https://api.thecatapi.com/v1/favourites", bytes.NewBuffer(jsonBody))
 	if err != nil {
 		c.Ctx.Output.SetStatus(500)
 		c.Data["json"] = map[string]string{"error": err.Error()}
@@ -43,14 +43,28 @@ func (c *VotingController) AddFavorite() {
 		return
 	}
 
-	resp, err := utils.MakeRequest("POST", "https://api.thecatapi.com/v1/favourites", apiKey, body)
+	apiReq.Header.Set("Content-Type", "application/json")
+	apiReq.Header.Set("x-api-key", apiKey)
+
+	resp, err := client.Do(apiReq)
 	if err != nil {
 		c.Ctx.Output.SetStatus(500)
 		c.Data["json"] = map[string]string{"error": err.Error()}
 		c.ServeJSON()
 		return
 	}
+	defer resp.Body.Close()
 
-	c.Data["json"] = json.RawMessage(resp)
+	// Log the response for debugging
+	body, _ := ioutil.ReadAll(resp.Body)
+	if resp.StatusCode != http.StatusOK {
+		c.Ctx.Output.SetStatus(resp.StatusCode)
+		c.Data["json"] = map[string]string{"error": string(body)}
+		c.ServeJSON()
+		return
+	}
+
+	c.Ctx.Output.SetStatus(http.StatusOK)
+	c.Data["json"] = json.RawMessage(body)
 	c.ServeJSON()
 }
