@@ -1,0 +1,53 @@
+C:\Users\ASUS\go\src>bee new cat-connect
+2024/12/21 02:42:54.600 [D]  init global config instance failed. If you do not use this, just ignore it.  open conf/app.conf: The system cannot find the path specified.
+2024/12/21 02:42:54 INFO     ▶ 0001 Generate new project support go modules.
+2024/12/21 02:42:54 INFO     ▶ 0002 Creating application...
+        create   C:\Users\ASUS\go\src\cat-connect\go.mod
+        create   C:\Users\ASUS\go\src\cat-connect\
+        create   C:\Users\ASUS\go\src\cat-connect\conf\
+        create   C:\Users\ASUS\go\src\cat-connect\controllers\
+        create   C:\Users\ASUS\go\src\cat-connect\models\
+        create   C:\Users\ASUS\go\src\cat-connect\routers\
+        create   C:\Users\ASUS\go\src\cat-connect\tests\
+        create   C:\Users\ASUS\go\src\cat-connect\static\
+        create   C:\Users\ASUS\go\src\cat-connect\static\js\
+        create   C:\Users\ASUS\go\src\cat-connect\static\css\
+        create   C:\Users\ASUS\go\src\cat-connect\static\img\
+        create   C:\Users\ASUS\go\src\cat-connect\views\
+        create   C:\Users\ASUS\go\src\cat-connect\conf\app.conf
+        create   C:\Users\ASUS\go\src\cat-connect\controllers\default.go
+        create   C:\Users\ASUS\go\src\cat-connect\views\index.tpl
+        create   C:\Users\ASUS\go\src\cat-connect\routers\router.go
+        create   C:\Users\ASUS\go\src\cat-connect\tests\default_test.go
+        create   C:\Users\ASUS\go\src\cat-connect\main.go
+2024/12/21 02:42:54 SUCCESS  ▶ 0003 New application successfully created!
+
+C:\Users\ASUS\go\src>cd cat-connect
+
+C:\Users\ASUS\go\src\cat-connect>code .
+
+C:\Users\ASUS\go\src\cat-connect>go mod tidy
+go: finding module for package github.com/kr/text
+go: found github.com/kr/text in github.com/kr/text v0.2.0
+
+C:\Users\ASUS\go\src\cat-connect>bee run
+______
+| ___ \
+| |_/ /  ___   ___
+| ___ \ / _ \ / _ \
+| |_/ /|  __/|  __/
+\____/  \___| \___| v2.3.0
+2024/12/21 02:45:23 WARN     ▶ 0001 Running application outside of GOPATH
+2024/12/21 02:45:23 INFO     ▶ 0002 Using 'cat-connect' as 'appname'
+2024/12/21 02:45:23 INFO     ▶ 0003 Initializing watcher...
+cat-connect
+2024/12/21 02:45:28 SUCCESS  ▶ 0004 Built Successfully!
+2024/12/21 02:45:28 INFO     ▶ 0005 Restarting 'cat-connect.exe'...
+2024/12/21 02:45:28 SUCCESS  ▶ 0006 './cat-connect.exe' is running...
+2024/12/21 02:45:29.495 [I] [server.go:281]  http server Running on http://:8080
+2024/12/21 02:45:36.621 [D] [router.go:1305]  |            ::1| 200 |     5.2223ms|   match| GET      /     r:/
+2024/12/21 02:45:36.631 [D] [router.go:1305]  |            ::1| 200 |      484.5µs|   match| GET      /static/js/reload.min.js
+2024/12/21 02:51:05.287 [D] [router.go:1305]  |            ::1| 404 |       77.3µs| nomatch| GET      /voting
+2024/12/21 02:51:05.345 [D] [router.go:1305]  |            ::1| 404 |           0s| nomatch| GET      /favicon.ico
+2024/12/21 02:51:08.667 [D] [router.go:1305]  |            ::1| 200 |     3.1399ms|   match| GET      /     r:/
+2024/12/21 02:51:08.690 [D] [router.go:1305]  |            ::1| 200 |           0s|   match| GET      /static/js/reload.min.js
