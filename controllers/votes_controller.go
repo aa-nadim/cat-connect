@@ -53,6 +53,8 @@ func (c *VotesController) Vote() {
 		c.Data["json"] = map[string]string{"error": "Request timed out"}
 	}
 
+	println("I am here................", c.Data)
+
 	c.ServeJSON()
 }
 
@@ -80,6 +82,8 @@ func (c *VotesController) GetVotes() {
 		c.Ctx.Output.SetStatus(504)
 		c.Data["json"] = map[string]string{"error": "Request timed out"}
 	}
+
+	println("I am here................", c.Data)
 
 	c.ServeJSON()
 }

@@ -15,7 +15,7 @@ class BreedsTab {
 
         console.log('Initializing BreedsTab component...');
         try {
-            // this.loading = true;
+            this.loading = true;
             this.updateUI();
             await this.fetchBreeds();
             this.initialized = true;
@@ -127,7 +127,8 @@ class BreedsTab {
                 <div class="mt-4">
                     <h3 class="fw-bold">
                         ${this.selectedBreed.name} 
-                        <span class="fw-normal text-muted">(${this.selectedBreed.origin})</span>
+                        <span class="text-muted">(${this.selectedBreed.origin})</span>
+                        <span class="text-sm italic fw-normal text-muted">${this.selectedBreed.id}</span>
                     </h3>
                     <p class="mt-2 text-muted">${this.selectedBreed.description}</p>
                     <a href="https://en.wikipedia.org/wiki/${this.selectedBreed.name}_cat" 

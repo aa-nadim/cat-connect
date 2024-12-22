@@ -12,7 +12,7 @@ class FavsTab {
 
         console.log('Initializing FavsTab component...');
         try {
-            // this.loading = true;
+            this.loading = true;
             this.updateUI();
             await this.fetchFavorites();
             this.initialized = true;
