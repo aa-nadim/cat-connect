@@ -1,0 +1,73 @@
+/* css/styles.css */
+:root {
+    --orange-500: #f97316;
+}
+
+.min-h-screen {
+    min-height: 100vh;
+}
+
+.nav-link.active {
+    color: var(--orange-500) !important;
+}
+
+.cat-image-container {
+    position: relative;
+    height: 384px;
+}
+
+.cat-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 0.375rem;
+}
+
+.image-id {
+    position: absolute;
+    bottom: 8px;
+    left: 8px;
+    background-color: rgba(0, 0, 0, 0.5);
+    color: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+}
+
+.action-icon {
+    cursor: pointer;
+    color: #666;
+    transition: color 0.3s;
+}
+
+.action-icon:hover {
+    color: var(--orange-500);
+}
+
+.loader {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 384px;
+}
+
+.breeds-dropdown {
+    position: relative;
+}
+
+.breeds-list {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    max-height: 240px;
+    overflow-y: auto;
+    z-index: 1000;
+    background: white;
+    border: 1px solid #dee2e6;
+    border-radius: 0.375rem;
+    display: none;
+}
+
+.breeds-list.show {
+    display: block;
+}
