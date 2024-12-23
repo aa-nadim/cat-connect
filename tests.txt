@@ -1,7 +1,26 @@
-go get -u github.com/stretchr/testify/assert
-go get -u github.com/axw/gocov/gocov
-go get -u github.com/matm/gocov-html
 
-
-go get golang.org/x/net/idna@v0.32.0
 go mod tidy
+___________________________________
+To run tests, use the go test command. For your specific test in tests/utils/api_request_test.go
+    
+    go test ./tests/utils/... -v
+
+_____________________________________-
+To run all tests across the project:
+
+    go test ./... -v
+
+_________________________________
+Run Coverage for api_request_test.go:
+
+        go test ./tests/utils/... -coverprofile=coverage.out
+
+______________________________________
+View Coverage in Terminal:
+
+    go tool cover -func=coverage.out
+
+_________________________________
+View Coverage as an HTML Report:
+
+    go tool cover -html=coverage.out
