@@ -7,6 +7,11 @@ class TabContent {
     }
 
     render(activeTab = 'voting') {
+        // When the 'favs' tab is selected, fetch the latest favorites
+        if (activeTab === 'favs') {
+            this.favsTab.fetchFavorites();
+        }
+
         return `
             <div class="card">
                 <div class="card-header bg-white">

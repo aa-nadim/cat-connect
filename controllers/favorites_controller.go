@@ -1,3 +1,5 @@
+// controllers/favorites_controller.go
+
 package controllers
 
 import (
@@ -44,8 +46,18 @@ func (c *FavoritesController) AddFavorite() {
 			c.Ctx.Output.SetStatus(500)
 			c.Data["json"] = map[string]string{"error": response.Error.Error()}
 		} else {
-			c.Ctx.Output.SetStatus(200)
-			c.Ctx.Output.Body(response.Body)
+			// Parse the response to get the new favorite's data
+			var favoriteResponse struct {
+				ID      int    `json:"id"`
+				Message string `json:"message"`
+			}
+			if err := json.Unmarshal(response.Body, &favoriteResponse); err != nil {
+				c.Ctx.Output.SetStatus(500)
+				c.Data["json"] = map[string]string{"error": "Error parsing response"}
+			} else {
+				// Return both the success message and the new favorite's data
+				c.Data["json"] = favoriteResponse
+			}
 		}
 	case <-time.After(15 * time.Second):
 		c.Ctx.Output.SetStatus(504)
@@ -58,7 +70,10 @@ func (c *FavoritesController) AddFavorite() {
 func (c *FavoritesController) GetFavorites() {
 	apiKey, _ := web.AppConfig.String("cat_api_key")
 	subID := c.GetString("sub_id")
-	url := fmt.Sprintf("https://api.thecatapi.com/v1/favourites?sub_id=%s", subID)
+
+	// Add cache-busting parameter to ensure fresh data
+	timestamp := time.Now().UnixNano()
+	url := fmt.Sprintf("https://api.thecatapi.com/v1/favourites?sub_id=%s&_=%d", subID, timestamp)
 
 	responseChan := utils.MakeAPIRequest("GET", url, nil, apiKey)
 
@@ -68,8 +83,14 @@ func (c *FavoritesController) GetFavorites() {
 			c.Ctx.Output.SetStatus(500)
 			c.Data["json"] = map[string]string{"error": response.Error.Error()}
 		} else {
-			c.Ctx.Output.SetStatus(200)
-			c.Ctx.Output.Body(response.Body)
+			// Parse the response to ensure it's valid JSON before sending
+			var favorites []map[string]interface{}
+			if err := json.Unmarshal(response.Body, &favorites); err != nil {
+				c.Ctx.Output.SetStatus(500)
+				c.Data["json"] = map[string]string{"error": "Error parsing favorites"}
+			} else {
+				c.Data["json"] = favorites
+			}
 		}
 	case <-time.After(15 * time.Second):
 		c.Ctx.Output.SetStatus(504)

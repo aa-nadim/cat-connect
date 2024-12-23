@@ -1,3 +1,7 @@
+Now which file do I give you?
+
+This is models/favorite.go. explain the whole code and the purpose of the code.
+
 C:\Users\ASUS\go\src>bee new cat-connect
 2024/12/21 02:42:54.600 [D]  init global config instance failed. If you do not use this, just ignore it.  open conf/app.conf: The system cannot find the path specified.
 2024/12/21 02:42:54 INFO     ▶ 0001 Generate new project support go modules.
