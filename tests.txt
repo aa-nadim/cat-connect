@@ -6,6 +6,8 @@ Run a specific test file:
 
     go test ./tests/controllers/breeds_controller_test.go
 
+    go test ./tests/controllers/favorites_controller_test.go
+
 _________________________________
 go test -coverprofile=coverage.out ./...
 go tool cover -html=coverage.out
