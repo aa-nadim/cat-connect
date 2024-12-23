@@ -9,7 +9,6 @@ import (
 	"cat-connect/utils"
 
 	"github.com/beego/beego/v2/server/web"
-	beego "github.com/beego/beego/v2/server/web"
 )
 
 type BreedsController struct {
@@ -45,34 +44,6 @@ func (c *BreedsController) GetBreeds() {
 
 	// Log the final response data being sent
 	fmt.Println("Final Response:", c.Data["json"])
-
-	c.ServeJSON()
-}
-
-func (c *BreedsController) GetCatImages() {
-	apiKey, _ := beego.AppConfig.String("cat_api_key")
-	url := "https://api.thecatapi.com/v1/images/search?limit=10"
-
-	responseChan := utils.MakeAPIRequest("GET", url, nil, apiKey)
-
-	select {
-	case response := <-responseChan:
-		if response.Error != nil {
-			c.Ctx.Output.SetStatus(500)
-			c.Data["json"] = map[string]string{"error": response.Error.Error()}
-		} else {
-			var catImages []models.CatImage
-			if err := json.Unmarshal(response.Body, &catImages); err != nil {
-				c.Ctx.Output.SetStatus(500)
-				c.Data["json"] = map[string]string{"error": fmt.Sprintf("Error parsing cat images: %v", err)}
-			} else {
-				c.Data["json"] = catImages
-			}
-		}
-	case <-time.After(15 * time.Second):
-		c.Ctx.Output.SetStatus(504)
-		c.Data["json"] = map[string]string{"error": "Request timed out"}
-	}
 
 	c.ServeJSON()
 }

@@ -1,0 +1,7 @@
+go get -u github.com/stretchr/testify/assert
+go get -u github.com/axw/gocov/gocov
+go get -u github.com/matm/gocov-html
+
+
+go get golang.org/x/net/idna@v0.32.0
+go mod tidy

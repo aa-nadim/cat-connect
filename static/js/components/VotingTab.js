@@ -80,10 +80,11 @@ class VotingTab {
                     sub_id: 'user-123',
                     value: value
                 });
+                console.log('Vote response:', response);
                 if (response.status === 201) {
                     this.votes[imageId] = value;
-                    this.handleNextImage();
                 }
+                this.handleNextImage();
             } catch (error) {
                 console.error('Error voting:', error);
             } finally {
