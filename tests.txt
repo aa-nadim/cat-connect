@@ -1,26 +1,18 @@
 
 go mod tidy
 ___________________________________
-To run tests, use the go test command. For your specific test in tests/utils/api_request_test.go
-    
-    go test ./tests/utils/... -v
-
-_____________________________________-
-To run all tests across the project:
-
-    go test ./... -v
+Run a specific test file:
+    go test ./tests/controllers/votes_controller_test.go
 
 _________________________________
-Run Coverage for api_request_test.go:
+go test -coverprofile=coverage.out ./...
+go tool cover -html=coverage.out
+___________________________________
 
-        go test ./tests/utils/... -coverprofile=coverage.out
 
-______________________________________
-View Coverage in Terminal:
 
-    go tool cover -func=coverage.out
 
-_________________________________
-View Coverage as an HTML Report:
 
-    go tool cover -html=coverage.out
+
+
+=============================================================
