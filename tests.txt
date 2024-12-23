@@ -14,8 +14,9 @@ go tool cover -html=coverage.out
 ___________________________________
 
 
-
-
+go test ./tests/models/breed_test.go
+go test ./tests/models/favorite_test.go
+go test ./tests/models/models_test.go
 
 
 
