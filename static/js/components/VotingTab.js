@@ -129,7 +129,6 @@ class VotingTab {
         return `
             <div class="cat-image-container mb-3">
                 <img src="${currentImage.url}" alt="Random cat" class="cat-image">
-                <span class="image-id">${currentImage.id}</span>
             </div>
             <div class="d-flex justify-content-between align-items-center px-2">
                 <i class="fas fa-heart action-icon" onclick="votingTab.handleFavorite()"></i>

@@ -43,12 +43,13 @@ func (c *BreedsController) GetBreeds() {
 	}
 
 	// Log the final response data being sent
-	fmt.Println("Final Response:", c.Data["json"])
+	//fmt.Println("Final Response:", c.Data["json"])
 
 	c.ServeJSON()
 }
 
 func (c *BreedsController) GetCatImagesByBreed() {
+	apiKey, _ := web.AppConfig.String("cat_api_key")
 	breedID := c.GetString("breed_id")
 	if breedID == "" {
 		c.Ctx.Output.SetStatus(400)
@@ -57,8 +58,9 @@ func (c *BreedsController) GetCatImagesByBreed() {
 		return
 	}
 
-	url := fmt.Sprintf("https://api.thecatapi.com/v1/images/search?breed_ids=%s", breedID)
-	responseChan := utils.MakeAPIRequest("GET", url, nil, "")
+	url := fmt.Sprintf("https://api.thecatapi.com/v1/images/search?breed_ids=%s&limit=5", breedID)
+
+	responseChan := utils.MakeAPIRequest("GET", url, nil, apiKey)
 
 	select {
 	case response := <-responseChan:

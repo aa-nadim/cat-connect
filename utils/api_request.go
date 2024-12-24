@@ -21,6 +21,9 @@ var MakeAPIRequest = func(method, url string, body []byte, apiKey string) chan A
 			return
 		}
 		req.Header.Set("x-api-key", apiKey)
+		// Add content type header for JSON
+		req.Header.Set("Content-Type", "application/json")
+
 		client := &http.Client{Timeout: 10 * time.Second}
 		resp, err := client.Do(req)
 		if err != nil {

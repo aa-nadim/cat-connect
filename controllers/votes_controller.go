@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"strings"
 	"time"
 
 	"cat-connect/models"
@@ -48,6 +49,8 @@ func (c *VotesController) GetCatImages() {
 func (c *VotesController) AddFavorite() {
 	apiKey, _ := web.AppConfig.String("cat_api_key")
 
+	fmt.Printf("Using API key: %s\n", "****"+apiKey[len(apiKey)-4:])
+
 	body, err := ioutil.ReadAll(c.Ctx.Request.Body)
 	if err != nil {
 		c.Ctx.Output.SetStatus(400)
@@ -55,6 +58,8 @@ func (c *VotesController) AddFavorite() {
 		c.ServeJSON()
 		return
 	}
+
+	fmt.Printf("Incoming request body: %s\n", string(body))
 
 	var favorite models.Favorite
 	if err := json.Unmarshal(body, &favorite); err != nil {
@@ -64,29 +69,55 @@ func (c *VotesController) AddFavorite() {
 		return
 	}
 
+	fmt.Printf("Parsed favorite: %+v\n", favorite)
+
+	favoriteJSON, err := json.Marshal(favorite)
+	if err != nil {
+		c.Ctx.Output.SetStatus(500)
+		c.Data["json"] = map[string]string{"error": "Error preparing request"}
+		c.ServeJSON()
+		return
+	}
+
 	url := "https://api.thecatapi.com/v1/favourites"
-	responseChan := utils.MakeAPIRequest("POST", url, body, apiKey)
+	fmt.Printf("Making request to: %s\n", url)
+	fmt.Printf("Request payload: %s\n", string(favoriteJSON))
+
+	responseChan := utils.MakeAPIRequest("POST", url, favoriteJSON, apiKey)
 
 	select {
 	case response := <-responseChan:
 		if response.Error != nil {
+			fmt.Printf("API Error: %v\n", response.Error)
 			c.Ctx.Output.SetStatus(500)
 			c.Data["json"] = map[string]string{"error": response.Error.Error()}
 		} else {
-			// Parse the response to get the new favorite's data
-			var favoriteResponse struct {
-				ID      int    `json:"id"`
-				Message string `json:"message"`
-			}
-			if err := json.Unmarshal(response.Body, &favoriteResponse); err != nil {
-				c.Ctx.Output.SetStatus(500)
-				c.Data["json"] = map[string]string{"error": "Error parsing response"}
+			rawResponse := string(response.Body)
+			fmt.Printf("Raw API Response: %s\n", rawResponse)
+
+			// If response starts with a quote, it's probably an error message
+			if strings.HasPrefix(rawResponse, "\"") {
+				// Remove quotes and return as error
+				errorMsg := strings.Trim(rawResponse, "\"")
+				c.Ctx.Output.SetStatus(400)
+				c.Data["json"] = map[string]string{"error": errorMsg}
 			} else {
-				// Return both the success message and the new favorite's data
-				c.Data["json"] = favoriteResponse
+				var favoriteResponse struct {
+					ID      int    `json:"id"`
+					Message string `json:"message"`
+				}
+				if err := json.Unmarshal(response.Body, &favoriteResponse); err != nil {
+					fmt.Printf("Error parsing response: %v\n", err)
+					c.Ctx.Output.SetStatus(500)
+					c.Data["json"] = map[string]string{"error": fmt.Sprintf("Failed to parse API response: %v", err)}
+				} else {
+					c.Ctx.Output.SetStatus(200)
+					c.Data["json"] = favoriteResponse
+				}
 			}
 		}
 	case <-time.After(15 * time.Second):
+		fmt.Println("Request timed out")
 		c.Ctx.Output.SetStatus(504)
 		c.Data["json"] = map[string]string{"error": "Request timed out"}
 	}

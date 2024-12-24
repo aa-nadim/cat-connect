@@ -1,17 +1,17 @@
-// js/components/BreedsTab.js
 class BreedsTab {
     constructor() {
         this.breeds = [];
         this.selectedBreed = null;
-        this.catImage = null;
+        this.catImages = [];
+        this.currentImageIndex = 0;
         this.isDropdownOpen = false;
         this.loading = true;
         this.error = null;
+        this.slideInterval = null;
     }
 
-    // Add to each component's init method
     async init() {
-        if (this.initialized) return; // Prevent multiple initializations
+        if (this.initialized) return;
 
         console.log('Initializing BreedsTab component...');
         try {
@@ -32,24 +32,25 @@ class BreedsTab {
             if (this.breeds.length > 0) {
                 this.selectedBreed = this.breeds[0];
                 await this.fetchCatImageByBreed(this.breeds[0].id);
-                }
-            } catch (error) {
-                this.error = 'Failed to load breeds. Please try again later.';
-                console.error(error);
-            } finally {
-                this.loading = false;
-                this.updateUI();
             }
+        } catch (error) {
+            this.error = 'Failed to load breeds. Please try again later.';
+            console.error(error);
+        } finally {
+            this.loading = false;
+            this.updateUI();
+        }
     }
-    
+
     async fetchCatImageByBreed(breedId) {
         try {
             this.loading = true;
             this.updateUI();
             const response = await axios.get(`${config.apiBaseURL}/api/cat-images/by-breed?breed_id=${breedId}`);
-            if (response.data.length > 0) {
-                this.catImage = response.data[0];
-            }
+            this.catImages = response.data;
+            this.currentImageIndex = 0;
+            // Start slideshow after loading images
+            this.startSlideshow();
         } catch (error) {
             this.error = 'Failed to load cat image. Please try again later.';
             console.error(error);
@@ -58,17 +59,59 @@ class BreedsTab {
             this.updateUI();
         }
     }
-    
+
+
+    startSlideshow() {
+        this.stopSlideshow(); // Clear any previous interval
+        if (this.catImages.length > 1) {
+            this.slideInterval = setInterval(() => {
+                // Only update if we're still on the breeds tab
+                if (window.location.pathname === '/breeds') {
+                    this.currentImageIndex = (this.currentImageIndex + 1) % this.catImages.length;
+                    this.updateUI();
+                } else {
+                    this.stopSlideshow(); // Stop if we're not on breeds tab
+                }
+            }, 3000); // Changed to 3 seconds for smoother transitions
+        }
+    }
+
+    stopSlideshow() {
+        if (this.slideInterval) {
+            clearInterval(this.slideInterval);
+            this.slideInterval = null;
+        }
+    }
+
+    updateUI() {
+        const content = document.getElementById('tab-content');
+        // Only update if we're on the breeds tab
+        if (content && window.location.pathname === '/breeds') {
+            content.innerHTML = this.render();
+        }
+    }
+
+    async handleBreedSelect(breed) {
+        this.stopSlideshow(); // Stop current slideshow
+        this.selectedBreed = breed;
+        this.isDropdownOpen = false;
+        await this.fetchCatImageByBreed(breed.id);
+    }
+
     toggleDropdown() {
         this.isDropdownOpen = !this.isDropdownOpen;
         this.updateUI();
     }
 
     async handleBreedSelect(breed) {
+        this.stopSlideshow(); // Stop current slideshow
         this.selectedBreed = breed;
         this.isDropdownOpen = false;
         await this.fetchCatImageByBreed(breed.id);
+        // fetchCatImageByBreed will start the new slideshow
     }
+
+
 
     updateUI() {
         const content = document.getElementById('tab-content');
@@ -108,15 +151,24 @@ class BreedsTab {
                     `).join('')}
                 </div>
             </div>
-            <div class="cat-image-container mb-3">
+            <div class="cat-image-container mb-3 position-relative">
                 ${this.loading ? `
                     <div class="loader">
                         <div class="spinner-border text-primary" role="status">
                             <span class="visually-hidden">Loading...</span>
                         </div>
                     </div>
-                ` : this.catImage ? `
-                    <img src="${this.catImage.url}" alt="${this.selectedBreed.name} cat" class="cat-image">
+                ` : this.catImages.length > 0 ? `
+                    <img src="${this.catImages[this.currentImageIndex].url}" 
+                         alt="${this.selectedBreed.name} cat" 
+                         class="cat-image w-100" />
+
+                    <div class="dots-container position-absolute bottom-0 w-100 d-flex justify-content-center gap-2 p-2">
+                        ${this.catImages.map((_, index) => `
+                            <span class="rounded-circle ${index === this.currentImageIndex ? 'bg-primary' : 'bg-secondary'}"
+                                style="width: 10px; height: 10px; display: inline-block;"></span>
+                        `).join('')}
+                    </div>
                 ` : `
                     <div class="d-flex justify-content-center align-items-center h-100">
                         No image available for this breed
@@ -128,7 +180,6 @@ class BreedsTab {
                     <h3 class="fw-bold">
                         ${this.selectedBreed.name} 
                         <span class="text-muted">(${this.selectedBreed.origin})</span>
-                        <span class="text-sm italic fw-normal text-muted">${this.selectedBreed.id}</span>
                     </h3>
                     <p class="mt-2 text-muted">${this.selectedBreed.description}</p>
                     <a href="https://en.wikipedia.org/wiki/${this.selectedBreed.name}_cat" 
