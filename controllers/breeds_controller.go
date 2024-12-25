@@ -30,8 +30,6 @@ func (c *BreedsController) GetBreeds() {
 				c.Ctx.Output.SetStatus(500)
 				c.Data["json"] = map[string]string{"error": fmt.Sprintf("Error parsing breeds: %v", err)}
 			} else {
-				// Log the response data
-				fmt.Println("Response Data:", breeds)
 
 				// Assign the breeds to the response
 				c.Data["json"] = breeds
@@ -41,9 +39,6 @@ func (c *BreedsController) GetBreeds() {
 		c.Ctx.Output.SetStatus(504)
 		c.Data["json"] = map[string]string{"error": "Request timed out"}
 	}
-
-	// Log the final response data being sent
-	//fmt.Println("Final Response:", c.Data["json"])
 
 	c.ServeJSON()
 }

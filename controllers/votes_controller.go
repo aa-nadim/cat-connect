@@ -117,7 +117,6 @@ func (c *VotesController) AddFavorite() {
 			}
 		}
 	case <-time.After(15 * time.Second):
-		fmt.Println("Request timed out")
 		c.Ctx.Output.SetStatus(504)
 		c.Data["json"] = map[string]string{"error": "Request timed out"}
 	}
@@ -160,9 +159,6 @@ func (c *VotesController) Vote() {
 			return
 		}
 
-		// Log and confirm successful vote creation
-		fmt.Println("Vote created successfully. Response:", string(response.Body))
-
 		// After successful vote creation, call GetVotes to retrieve the updated votes list
 		c.GetVotes()
 		return
@@ -171,8 +167,6 @@ func (c *VotesController) Vote() {
 		// Handle timeout
 		c.Ctx.Output.SetStatus(504)
 		c.Data["json"] = map[string]string{"error": "Request timed out"}
-
-		println("I am here................", c.Data)
 
 		c.ServeJSON()
 		return
@@ -203,8 +197,6 @@ func (c *VotesController) GetVotes() {
 		c.Ctx.Output.SetStatus(504)
 		c.Data["json"] = map[string]string{"error": "Request timed out"}
 	}
-
-	println("I am here................", c.Data)
 
 	c.ServeJSON()
 }
