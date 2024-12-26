@@ -67,9 +67,7 @@
 				
 				<option value="file5">cat-connect/routers/router.go (100.0%)</option>
 				
-				<option value="file6">cat-connect/tests/utils/mocks/mock_api.go (0.0%)</option>
-				
-				<option value="file7">cat-connect/utils/api_request.go (70.0%)</option>
+				<option value="file6">cat-connect/utils/api_request.go (70.0%)</option>
 				
 				</select>
 			</div>
@@ -503,47 +501,7 @@ func init() <span class="cov8" title="1">{
 }</span>
 </pre>
 		
-		<pre class="file" id="file6" style="display: none">// tests/utils/mocks/mock_api.go
-package mocks
-
-import (
-        "net/http"
-        "net/http/httptest"
-)
-
-type MockAPI struct {
-        server *httptest.Server
-}
-
-func NewMockAPI() *MockAPI <span class="cov0" title="0">{
-        mock := &amp;MockAPI{}
-        mock.server = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) </span><span class="cov0" title="0">{
-                switch r.URL.Path </span>{
-                case "/v1/images/search":<span class="cov0" title="0">
-                        w.Write([]byte(`[{"url": "http://example.com/cat.jpg"}]`))</span>
-                case "/v1/breeds":<span class="cov0" title="0">
-                        w.Write([]byte(`[{"id": "beng", "name": "Bengal"}]`))</span>
-                case "/v1/favourites":<span class="cov0" title="0">
-                        w.Write([]byte(`{"id": 123, "message": "Success"}`))</span>
-                case "/v1/votes":<span class="cov0" title="0">
-                        w.Write([]byte(`{"message": "SUCCESS"}`))</span>
-                default:<span class="cov0" title="0">
-                        w.WriteHeader(http.StatusNotFound)</span>
-                }
-        }))
-        <span class="cov0" title="0">return mock</span>
-}
-
-func (m *MockAPI) URL() string <span class="cov0" title="0">{
-        return m.server.URL
-}</span>
-
-func (m *MockAPI) Close() <span class="cov0" title="0">{
-        m.server.Close()
-}</span>
-</pre>
-		
-		<pre class="file" id="file7" style="display: none">package utils
+		<pre class="file" id="file6" style="display: none">package utils
 
 import (
         "bytes"

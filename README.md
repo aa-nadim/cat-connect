@@ -91,11 +91,7 @@ Before you begin, ensure you have met the following requirements:
 ## Unit Tests
 
 ```bash
-go test ./tests/controllers/breeds_controller_test.go
-go test ./tests/controllers/favorites_controller_test.go
-go test ./tests/controllers/votes_controller_test.go
 
-go test ./tests/routers/router_test.go
 
 go test ./tests/...
 go test -v ./tests/...
@@ -105,16 +101,14 @@ go test -coverprofile=coverage.out ./...
 go tool cover -html=coverage.out
 
 
+
 go test ./... -coverprofile=coverage.out
+go tool cover -html=coverage.out -o coverage.html
+open coverage.html
+
 
 # Display total coverage percentage
 go tool cover -func=coverage.out | grep total: | awk '{print $3}'
-
-# Generate HTML coverage report (optional)
-go tool cover -html=coverage.out -o coverage.html
-
-# Open the HTML report (optional)
-open coverage.html
 ```
 
 
