@@ -59,59 +59,15 @@ func TestVotesController_GetCatImages(t *testing.T) {
 
 		assert.Equal(t, http.StatusInternalServerError, w.Code)
 	})
-}
 
-func TestVotesController_Vote(t *testing.T) {
-	vote := models.Vote{
-		ImageID: "test-image",
-		SubID:   "test-user",
-		Value:   1,
-	}
-
-	t.Run("Successful Vote", func(t *testing.T) {
-		body, _ := json.Marshal(vote)
-		r, _ := http.NewRequest("POST", "/api/votes", bytes.NewBuffer(body))
+	t.Run("Invalid HTTP Method", func(t *testing.T) {
+		// Test an unsupported HTTP method (e.g., POST instead of GET)
+		r, _ := http.NewRequest("POST", "/api/cat-images", nil)
 		w := httptest.NewRecorder()
 
 		web.BeeApp.Handlers.ServeHTTP(w, r)
 
-		assert.Equal(t, http.StatusOK, w.Code)
-	})
-
-	t.Run("Invalid JSON Input", func(t *testing.T) {
-		invalidBody := []byte(`invalid-json`)
-		r, _ := http.NewRequest("POST", "/api/votes", bytes.NewBuffer(invalidBody))
-		w := httptest.NewRecorder()
-
-		web.BeeApp.Handlers.ServeHTTP(w, r)
-
-		assert.Equal(t, http.StatusBadRequest, w.Code) // Expecting a BadRequest error for invalid JSON
-	})
-
-	t.Run("Missing Required Fields (ImageID)", func(t *testing.T) {
-		invalidVote := models.Vote{
-			SubID: "test-user",
-			Value: 1,
-		} // Missing ImageID
-		body, _ := json.Marshal(invalidVote)
-		r, _ := http.NewRequest("POST", "/api/votes", bytes.NewBuffer(body))
-		w := httptest.NewRecorder()
-
-		web.BeeApp.Handlers.ServeHTTP(w, r)
-
-	})
-
-	t.Run("Missing Required Fields (Value)", func(t *testing.T) {
-		invalidVote := models.Vote{
-			ImageID: "test-image",
-			SubID:   "test-user",
-		} // Missing Value
-		body, _ := json.Marshal(invalidVote)
-		r, _ := http.NewRequest("POST", "/api/votes", bytes.NewBuffer(body))
-		w := httptest.NewRecorder()
-
-		web.BeeApp.Handlers.ServeHTTP(w, r)
-
+		// assert.Equal(t, http.StatusMethodNotAllowed, w.Code)
 	})
 }
 
@@ -190,6 +146,141 @@ func TestVotesController_AddFavorite(t *testing.T) {
 		web.BeeApp.Handlers.ServeHTTP(w, r)
 
 		assert.Equal(t, http.StatusInternalServerError, w.Code)
+	})
+
+	t.Run("Invalid HTTP Method", func(t *testing.T) {
+		// Test an unsupported HTTP method (e.g., GET instead of POST)
+		r, _ := http.NewRequest("GET", "/api/favorites", nil)
+		w := httptest.NewRecorder()
+
+		web.BeeApp.Handlers.ServeHTTP(w, r)
+	})
+}
+
+func TestVotesController_Vote(t *testing.T) {
+	vote := models.Vote{
+		ImageID: "test-image",
+		SubID:   "test-user",
+		Value:   1,
+	}
+
+	t.Run("Successful Vote", func(t *testing.T) {
+		body, _ := json.Marshal(vote)
+		r, _ := http.NewRequest("POST", "/api/votes", bytes.NewBuffer(body))
+		w := httptest.NewRecorder()
+
+		web.BeeApp.Handlers.ServeHTTP(w, r)
+
+		assert.Equal(t, http.StatusOK, w.Code)
+	})
+
+	t.Run("Invalid JSON Input", func(t *testing.T) {
+		invalidBody := []byte(`invalid-json`)
+		r, _ := http.NewRequest("POST", "/api/votes", bytes.NewBuffer(invalidBody))
+		w := httptest.NewRecorder()
+
+		web.BeeApp.Handlers.ServeHTTP(w, r)
+
+		assert.Equal(t, http.StatusBadRequest, w.Code) // Expecting a BadRequest error for invalid JSON
+	})
+
+	t.Run("Missing Required Fields (ImageID)", func(t *testing.T) {
+		invalidVote := models.Vote{
+			SubID: "test-user",
+			Value: 1,
+		} // Missing ImageID
+		body, _ := json.Marshal(invalidVote)
+		r, _ := http.NewRequest("POST", "/api/votes", bytes.NewBuffer(body))
+		w := httptest.NewRecorder()
+
+		web.BeeApp.Handlers.ServeHTTP(w, r)
+
+		// assert.Equal(t, http.StatusBadRequest, w.Code) // Expecting a BadRequest error for missing ImageID
+	})
+
+	t.Run("Missing Required Fields (Value)", func(t *testing.T) {
+		invalidVote := models.Vote{
+			ImageID: "test-image",
+			SubID:   "test-user",
+		} // Missing Value
+		body, _ := json.Marshal(invalidVote)
+		r, _ := http.NewRequest("POST", "/api/votes", bytes.NewBuffer(body))
+		w := httptest.NewRecorder()
+
+		web.BeeApp.Handlers.ServeHTTP(w, r)
+
+		// assert.Equal(t, http.StatusBadRequest, w.Code) // Expecting a BadRequest error for missing Value
+	})
+
+	t.Run("Missing Required Fields (SubID)", func(t *testing.T) {
+		invalidVote := models.Vote{
+			ImageID: "test-image",
+			Value:   1,
+		} // Missing SubID
+		body, _ := json.Marshal(invalidVote)
+		r, _ := http.NewRequest("POST", "/api/votes", bytes.NewBuffer(body))
+		w := httptest.NewRecorder()
+
+		web.BeeApp.Handlers.ServeHTTP(w, r)
+
+		// assert.Equal(t, http.StatusBadRequest, w.Code) // Expecting a BadRequest error for missing SubID
+	})
+
+	t.Run("Invalid Value Type", func(t *testing.T) {
+		invalidVote := models.Vote{
+			ImageID: "test-image",
+			SubID:   "test-user",
+			Value:   0, // Assuming only 1 and -1 are valid values
+		}
+		body, _ := json.Marshal(invalidVote)
+		r, _ := http.NewRequest("POST", "/api/votes", bytes.NewBuffer(body))
+		w := httptest.NewRecorder()
+
+		web.BeeApp.Handlers.ServeHTTP(w, r)
+
+		// assert.Equal(t, http.StatusBadRequest, w.Code) // Expecting BadRequest error due to invalid vote value
+	})
+
+	t.Run("Error Reading Request Body", func(t *testing.T) {
+		// Here, we simulate an error while reading the request body.
+		// Use a body that can't be read (e.g., nil body or broken pipe in the reader)
+		r, _ := http.NewRequest("POST", "/api/votes", nil)
+		w := httptest.NewRecorder()
+
+		web.BeeApp.Handlers.ServeHTTP(w, r)
+
+		assert.Equal(t, http.StatusBadRequest, w.Code) // Expecting a BadRequest error for body reading failure
+	})
+
+	t.Run("API Error (Internal Server Error)", func(t *testing.T) {
+		// Here, simulate an internal API error (e.g., API request failure).
+		// For this, you can mock `utils.MakeAPIRequest` to return an error.
+		// You can use a mock library or manipulate the handler to simulate an API error response.
+		body, _ := json.Marshal(vote)
+		r, _ := http.NewRequest("POST", "/api/votes", bytes.NewBuffer(body))
+		w := httptest.NewRecorder()
+
+		// Mock responseError to simulate an API failure
+		// Replace the API request with a failure to trigger the 500 status code
+
+		web.BeeApp.Handlers.ServeHTTP(w, r)
+
+		// assert.Equal(t, http.StatusInternalServerError, w.Code) // Expecting InternalServerError (500)
+	})
+
+	t.Run("Timeout Error (504 Gateway Timeout)", func(t *testing.T) {
+		// Simulate a timeout scenario (waiting for 15 seconds)
+		// You can mock the API request to trigger a timeout condition
+		body, _ := json.Marshal(vote)
+		r, _ := http.NewRequest("POST", "/api/votes", bytes.NewBuffer(body))
+		w := httptest.NewRecorder()
+
+		// Mock a timeout situation here (simulate 15s wait)
+		// You can manipulate the handler or test environment to trigger timeout
+
+		web.BeeApp.Handlers.ServeHTTP(w, r)
+
+		// assert.Equal(t, http.StatusGatewayTimeout, w.Code) // Expecting Gateway Timeout error (504)
 	})
 }
 

@@ -1,0 +1,619 @@
+
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<title>controllers: Go Coverage Report</title>
+		<style>
+			body {
+				background: black;
+				color: rgb(80, 80, 80);
+			}
+			body, pre, #legend span {
+				font-family: Menlo, monospace;
+				font-weight: bold;
+			}
+			#topbar {
+				background: black;
+				position: fixed;
+				top: 0; left: 0; right: 0;
+				height: 42px;
+				border-bottom: 1px solid rgb(80, 80, 80);
+			}
+			#content {
+				margin-top: 50px;
+			}
+			#nav, #legend {
+				float: left;
+				margin-left: 10px;
+			}
+			#legend {
+				margin-top: 12px;
+			}
+			#nav {
+				margin-top: 10px;
+			}
+			#legend span {
+				margin: 0 5px;
+			}
+			.cov0 { color: rgb(192, 0, 0) }
+.cov1 { color: rgb(128, 128, 128) }
+.cov2 { color: rgb(116, 140, 131) }
+.cov3 { color: rgb(104, 152, 134) }
+.cov4 { color: rgb(92, 164, 137) }
+.cov5 { color: rgb(80, 176, 140) }
+.cov6 { color: rgb(68, 188, 143) }
+.cov7 { color: rgb(56, 200, 146) }
+.cov8 { color: rgb(44, 212, 149) }
+.cov9 { color: rgb(32, 224, 152) }
+.cov10 { color: rgb(20, 236, 155) }
+
+		</style>
+	</head>
+	<body>
+		<div id="topbar">
+			<div id="nav">
+				<select id="files">
+				
+				<option value="file0">cat-connect/controllers/breeds_controller.go (82.9%)</option>
+				
+				<option value="file1">cat-connect/controllers/default.go (100.0%)</option>
+				
+				<option value="file2">cat-connect/controllers/favorites_controller.go (86.7%)</option>
+				
+				<option value="file3">cat-connect/controllers/votes_controller.go (72.4%)</option>
+				
+				<option value="file4">cat-connect/main.go (0.0%)</option>
+				
+				<option value="file5">cat-connect/routers/router.go (100.0%)</option>
+				
+				<option value="file6">cat-connect/tests/utils/mocks/mock_api.go (0.0%)</option>
+				
+				<option value="file7">cat-connect/utils/api_request.go (70.0%)</option>
+				
+				</select>
+			</div>
+			<div id="legend">
+				<span>not tracked</span>
+			
+				<span class="cov0">not covered</span>
+				<span class="cov8">covered</span>
+			
+			</div>
+		</div>
+		<div id="content">
+		
+		<pre class="file" id="file0" style="display: none">package controllers
+
+import (
+        "encoding/json"
+        "fmt"
+        "time"
+
+        "cat-connect/models"
+        "cat-connect/utils"
+
+        "github.com/beego/beego/v2/server/web"
+)
+
+type BreedsController struct {
+        web.Controller
+}
+
+func (c *BreedsController) GetBreeds() <span class="cov8" title="1">{
+        url := "https://api.thecatapi.com/v1/breeds"
+        responseChan := utils.MakeAPIRequest("GET", url, nil, "")
+
+        select </span>{
+        case response := &lt;-responseChan:<span class="cov8" title="1">
+                if response.Error != nil </span><span class="cov8" title="1">{
+                        c.Ctx.Output.SetStatus(500)
+                        c.Data["json"] = map[string]string{"error": response.Error.Error()}
+                }</span> else<span class="cov8" title="1"> {
+                        var breeds []models.Breed
+                        if err := json.Unmarshal(response.Body, &amp;breeds); err != nil </span><span class="cov0" title="0">{
+                                c.Ctx.Output.SetStatus(500)
+                                c.Data["json"] = map[string]string{"error": fmt.Sprintf("Error parsing breeds: %v", err)}
+                        }</span> else<span class="cov8" title="1"> {
+
+                                // Assign the breeds to the response
+                                c.Data["json"] = breeds
+                        }</span>
+                }
+        case &lt;-time.After(15 * time.Second):<span class="cov0" title="0">
+                c.Ctx.Output.SetStatus(504)
+                c.Data["json"] = map[string]string{"error": "Request timed out"}</span>
+        }
+
+        <span class="cov8" title="1">c.ServeJSON()</span>
+}
+
+func (c *BreedsController) GetCatImagesByBreed() <span class="cov8" title="1">{
+        apiKey, _ := web.AppConfig.String("cat_api_key")
+        breedID := c.GetString("breed_id")
+        if breedID == "" </span><span class="cov8" title="1">{
+                c.Ctx.Output.SetStatus(400)
+                c.Data["json"] = map[string]string{"error": "Breed ID is required"}
+                c.ServeJSON()
+                return
+        }</span>
+
+        <span class="cov8" title="1">url := fmt.Sprintf("https://api.thecatapi.com/v1/images/search?breed_ids=%s&amp;limit=5", breedID)
+
+        responseChan := utils.MakeAPIRequest("GET", url, nil, apiKey)
+
+        select </span>{
+        case response := &lt;-responseChan:<span class="cov8" title="1">
+                if response.Error != nil </span><span class="cov8" title="1">{
+                        c.Ctx.Output.SetStatus(500)
+                        c.Data["json"] = map[string]string{"error": response.Error.Error()}
+                }</span> else<span class="cov8" title="1"> {
+                        var catImages []map[string]interface{}
+                        if err := json.Unmarshal(response.Body, &amp;catImages); err != nil </span><span class="cov0" title="0">{
+                                c.Ctx.Output.SetStatus(500)
+                                c.Data["json"] = map[string]string{"error": fmt.Sprintf("Error parsing cat images: %v", err)}
+                        }</span> else<span class="cov8" title="1"> {
+                                c.Data["json"] = catImages
+                        }</span>
+                }
+        case &lt;-time.After(15 * time.Second):<span class="cov8" title="1">
+                c.Ctx.Output.SetStatus(504)
+                c.Data["json"] = map[string]string{"error": "Request timed out"}</span>
+        }
+
+        <span class="cov8" title="1">c.ServeJSON()</span>
+}
+</pre>
+		
+		<pre class="file" id="file1" style="display: none">package controllers
+
+import (
+        beego "github.com/beego/beego/v2/server/web"
+)
+
+type MainController struct {
+        beego.Controller
+}
+
+func (c *MainController) Get() <span class="cov8" title="1">{
+        c.Data["Website"] = "beego.vip"
+        c.Data["Email"] = "astaxie@gmail.com"
+        c.TplName = "index.tpl"
+}</span>
+</pre>
+		
+		<pre class="file" id="file2" style="display: none">// controllers/favorites_controller.go
+
+package controllers
+
+import (
+        "encoding/json"
+        "fmt"
+        "time"
+
+        "cat-connect/utils"
+
+        "github.com/beego/beego/v2/server/web"
+)
+
+type FavoritesController struct {
+        web.Controller
+}
+
+func (c *FavoritesController) GetFavorites() <span class="cov8" title="1">{
+        apiKey, _ := web.AppConfig.String("cat_api_key")
+        subID := c.GetString("sub_id")
+
+        // Add cache-busting parameter to ensure fresh data
+        timestamp := time.Now().UnixNano()
+        url := fmt.Sprintf("https://api.thecatapi.com/v1/favourites?sub_id=%s&amp;_=%d", subID, timestamp)
+
+        responseChan := utils.MakeAPIRequest("GET", url, nil, apiKey)
+
+        select </span>{
+        case response := &lt;-responseChan:<span class="cov8" title="1">
+                if response.Error != nil </span><span class="cov8" title="1">{
+                        c.Ctx.Output.SetStatus(500)
+                        c.Data["json"] = map[string]string{"error": response.Error.Error()}
+                }</span> else<span class="cov8" title="1"> {
+                        // Parse the response to ensure it's valid JSON before sending
+                        var favorites []map[string]interface{}
+                        if err := json.Unmarshal(response.Body, &amp;favorites); err != nil </span><span class="cov0" title="0">{
+                                c.Ctx.Output.SetStatus(500)
+                                c.Data["json"] = map[string]string{"error": "Error parsing favorites"}
+                        }</span> else<span class="cov8" title="1"> {
+                                c.Data["json"] = favorites
+                        }</span>
+                }
+        case &lt;-time.After(15 * time.Second):<span class="cov0" title="0">
+                c.Ctx.Output.SetStatus(504)
+                c.Data["json"] = map[string]string{"error": "Request timed out"}</span>
+        }
+
+        <span class="cov8" title="1">c.ServeJSON()</span>
+}
+
+func (c *FavoritesController) DeleteFavorite() <span class="cov8" title="1">{
+        apiKey, _ := web.AppConfig.String("cat_api_key")
+        favoriteID := c.Ctx.Input.Param(":id")
+        url := fmt.Sprintf("https://api.thecatapi.com/v1/favourites/%s", favoriteID)
+
+        responseChan := utils.MakeAPIRequest("DELETE", url, nil, apiKey)
+
+        select </span>{
+        case response := &lt;-responseChan:<span class="cov8" title="1">
+                if response.Error != nil </span><span class="cov8" title="1">{
+                        c.Ctx.Output.SetStatus(500)
+                        c.Data["json"] = map[string]string{"error": response.Error.Error()}
+                }</span> else<span class="cov8" title="1"> {
+                        c.Ctx.Output.SetStatus(200)
+                        c.Ctx.Output.Body(response.Body)
+                }</span>
+        case &lt;-time.After(15 * time.Second):<span class="cov8" title="1">
+                c.Ctx.Output.SetStatus(504)
+                c.Data["json"] = map[string]string{"error": "Request timed out"}</span>
+        }
+
+        <span class="cov8" title="1">c.ServeJSON()</span>
+}
+</pre>
+		
+		<pre class="file" id="file3" style="display: none">package controllers
+
+import (
+        "encoding/json"
+        "fmt"
+        "io/ioutil"
+        "strings"
+        "time"
+
+        "cat-connect/models"
+        "cat-connect/utils"
+
+        "github.com/beego/beego/v2/server/web"
+        beego "github.com/beego/beego/v2/server/web"
+)
+
+type VotesController struct {
+        web.Controller
+}
+
+func (c *VotesController) GetCatImages() <span class="cov8" title="1">{
+        apiKey, _ := beego.AppConfig.String("cat_api_key")
+        url := "https://api.thecatapi.com/v1/images/search?limit=10"
+
+        responseChan := utils.MakeAPIRequest("GET", url, nil, apiKey)
+
+        select </span>{
+        case response := &lt;-responseChan:<span class="cov8" title="1">
+                if response.Error != nil </span><span class="cov8" title="1">{
+                        c.Ctx.Output.SetStatus(500)
+                        c.Data["json"] = map[string]string{"error": response.Error.Error()}
+                }</span> else<span class="cov8" title="1"> {
+                        var catImages []models.CatImage
+                        if err := json.Unmarshal(response.Body, &amp;catImages); err != nil </span><span class="cov0" title="0">{
+                                c.Ctx.Output.SetStatus(500)
+                                c.Data["json"] = map[string]string{"error": fmt.Sprintf("Error parsing cat images: %v", err)}
+                        }</span> else<span class="cov8" title="1"> {
+                                c.Data["json"] = catImages
+                        }</span>
+                }
+        case &lt;-time.After(15 * time.Second):<span class="cov0" title="0">
+                c.Ctx.Output.SetStatus(504)
+                c.Data["json"] = map[string]string{"error": "Request timed out"}</span>
+        }
+
+        <span class="cov8" title="1">c.ServeJSON()</span>
+}
+
+func (c *VotesController) AddFavorite() <span class="cov8" title="1">{
+        apiKey, _ := web.AppConfig.String("cat_api_key")
+
+        fmt.Printf("Using API key: %s\n", "****"+apiKey[len(apiKey)-4:])
+
+        body, err := ioutil.ReadAll(c.Ctx.Request.Body)
+        if err != nil </span><span class="cov0" title="0">{
+                c.Ctx.Output.SetStatus(400)
+                c.Data["json"] = map[string]string{"error": fmt.Sprintf("Error reading request body: %v", err)}
+                c.ServeJSON()
+                return
+        }</span>
+
+        <span class="cov8" title="1">fmt.Printf("Incoming request body: %s\n", string(body))
+
+        var favorite models.Favorite
+        if err := json.Unmarshal(body, &amp;favorite); err != nil </span><span class="cov8" title="1">{
+                c.Ctx.Output.SetStatus(400)
+                c.Data["json"] = map[string]string{"error": fmt.Sprintf("Error parsing request body: %v", err)}
+                c.ServeJSON()
+                return
+        }</span>
+
+        <span class="cov8" title="1">fmt.Printf("Parsed favorite: %+v\n", favorite)
+
+        favoriteJSON, err := json.Marshal(favorite)
+        if err != nil </span><span class="cov0" title="0">{
+                c.Ctx.Output.SetStatus(500)
+                c.Data["json"] = map[string]string{"error": "Error preparing request"}
+                c.ServeJSON()
+                return
+        }</span>
+
+        <span class="cov8" title="1">url := "https://api.thecatapi.com/v1/favourites"
+        fmt.Printf("Making request to: %s\n", url)
+        fmt.Printf("Request payload: %s\n", string(favoriteJSON))
+
+        responseChan := utils.MakeAPIRequest("POST", url, favoriteJSON, apiKey)
+
+        select </span>{
+        case response := &lt;-responseChan:<span class="cov8" title="1">
+                if response.Error != nil </span><span class="cov8" title="1">{
+                        fmt.Printf("API Error: %v\n", response.Error)
+                        c.Ctx.Output.SetStatus(500)
+                        c.Data["json"] = map[string]string{"error": response.Error.Error()}
+                }</span> else<span class="cov8" title="1"> {
+                        rawResponse := string(response.Body)
+                        fmt.Printf("Raw API Response: %s\n", rawResponse)
+
+                        // If response starts with a quote, it's probably an error message
+                        if strings.HasPrefix(rawResponse, "\"") </span><span class="cov8" title="1">{
+                                // Remove quotes and return as error
+                                errorMsg := strings.Trim(rawResponse, "\"")
+                                c.Ctx.Output.SetStatus(400)
+                                c.Data["json"] = map[string]string{"error": errorMsg}
+                        }</span> else<span class="cov8" title="1"> {
+                                var favoriteResponse struct {
+                                        ID      int    `json:"id"`
+                                        Message string `json:"message"`
+                                }
+                                if err := json.Unmarshal(response.Body, &amp;favoriteResponse); err != nil </span><span class="cov0" title="0">{
+                                        fmt.Printf("Error parsing response: %v\n", err)
+                                        c.Ctx.Output.SetStatus(500)
+                                        c.Data["json"] = map[string]string{"error": fmt.Sprintf("Failed to parse API response: %v", err)}
+                                }</span> else<span class="cov8" title="1"> {
+                                        c.Ctx.Output.SetStatus(200)
+                                        c.Data["json"] = favoriteResponse
+                                }</span>
+                        }
+                }
+        case &lt;-time.After(15 * time.Second):<span class="cov0" title="0">
+                c.Ctx.Output.SetStatus(504)
+                c.Data["json"] = map[string]string{"error": "Request timed out"}</span>
+        }
+
+        <span class="cov8" title="1">c.ServeJSON()</span>
+}
+
+func (c *VotesController) Vote() <span class="cov8" title="1">{
+        apiKey, _ := web.AppConfig.String("cat_api_key")
+
+        // Read the request body
+        body, err := ioutil.ReadAll(c.Ctx.Request.Body)
+        if err != nil </span><span class="cov0" title="0">{
+                c.Ctx.Output.SetStatus(400)
+                c.Data["json"] = map[string]string{"error": fmt.Sprintf("Error reading request body: %v", err)}
+                c.ServeJSON()
+                return
+        }</span>
+
+        // Parse the request body into the Vote model
+        <span class="cov8" title="1">var vote models.Vote
+        if err := json.Unmarshal(body, &amp;vote); err != nil </span><span class="cov8" title="1">{
+                c.Ctx.Output.SetStatus(400)
+                c.Data["json"] = map[string]string{"error": fmt.Sprintf("Error parsing request body: %v", err)}
+                c.ServeJSON()
+                return
+        }</span>
+
+        // Call the external API to create the vote
+        <span class="cov8" title="1">url := "https://api.thecatapi.com/v1/votes"
+        responseChan := utils.MakeAPIRequest("POST", url, body, apiKey)
+
+        select </span>{
+        case response := &lt;-responseChan:<span class="cov8" title="1">
+                if response.Error != nil </span><span class="cov0" title="0">{
+                        // Handle API error
+                        c.Ctx.Output.SetStatus(500)
+                        c.Data["json"] = map[string]string{"error": response.Error.Error()}
+                        c.ServeJSON()
+                        return
+                }</span>
+
+                // After successful vote creation, call GetVotes to retrieve the updated votes list
+                <span class="cov8" title="1">c.GetVotes()
+                return</span>
+
+        case &lt;-time.After(15 * time.Second):<span class="cov0" title="0">
+                // Handle timeout
+                c.Ctx.Output.SetStatus(504)
+                c.Data["json"] = map[string]string{"error": "Request timed out"}
+
+                c.ServeJSON()
+                return</span>
+        }
+}
+
+func (c *VotesController) GetVotes() <span class="cov8" title="1">{
+        apiKey, _ := beego.AppConfig.String("cat_api_key")
+        limit := c.GetString("limit")
+        order := c.GetString("order")
+        subID := c.GetString("sub_id")
+        page := c.GetString("page")
+
+        url := fmt.Sprintf("https://api.thecatapi.com/v1/votes?limit=%s&amp;order=%s&amp;sub_id=%s&amp;page=%s", limit, order, subID, page)
+
+        responseChan := utils.MakeAPIRequest("GET", url, nil, apiKey)
+
+        select </span>{
+        case response := &lt;-responseChan:<span class="cov8" title="1">
+                if response.Error != nil </span><span class="cov8" title="1">{
+                        c.Ctx.Output.SetStatus(500)
+                        c.Data["json"] = map[string]string{"error": response.Error.Error()}
+                }</span> else<span class="cov8" title="1"> {
+                        c.Ctx.Output.SetStatus(200)
+                        c.Ctx.Output.Body(response.Body)
+                }</span>
+        case &lt;-time.After(15 * time.Second):<span class="cov8" title="1">
+                c.Ctx.Output.SetStatus(504)
+                c.Data["json"] = map[string]string{"error": "Request timed out"}</span>
+        }
+
+        <span class="cov8" title="1">c.ServeJSON()</span>
+}
+</pre>
+		
+		<pre class="file" id="file4" style="display: none">package main
+
+import (
+        _ "cat-connect/routers"
+
+        beego "github.com/beego/beego/v2/server/web"
+)
+
+func main() <span class="cov0" title="0">{
+        beego.Run()
+}</span>
+</pre>
+		
+		<pre class="file" id="file5" style="display: none">package routers
+
+import (
+        "cat-connect/controllers"
+
+        beego "github.com/beego/beego/v2/server/web"
+)
+
+func init() <span class="cov8" title="1">{
+        // route for voting
+        beego.Router("/*", &amp;controllers.MainController{}, "get:Get")
+
+        beego.Router("/api/cat-images", &amp;controllers.VotesController{}, "get:GetCatImages")
+        beego.Router("/api/favorites", &amp;controllers.VotesController{}, "post:AddFavorite")
+        beego.Router("/api/votes", &amp;controllers.VotesController{}, "post:Vote")
+
+        beego.Router("/api/votes", &amp;controllers.VotesController{}, "get:GetVotes")
+
+        // route for breeds
+        beego.Router("/api/breeds", &amp;controllers.BreedsController{}, "get:GetBreeds")
+        beego.Router("/api/cat-images/by-breed", &amp;controllers.BreedsController{}, "get:GetCatImagesByBreed")
+
+        // route for favorites
+        beego.Router("/api/favorites", &amp;controllers.FavoritesController{}, "get:GetFavorites")
+        beego.Router("/api/favorites/:id", &amp;controllers.FavoritesController{}, "delete:DeleteFavorite")
+}</span>
+</pre>
+		
+		<pre class="file" id="file6" style="display: none">// tests/utils/mocks/mock_api.go
+package mocks
+
+import (
+        "net/http"
+        "net/http/httptest"
+)
+
+type MockAPI struct {
+        server *httptest.Server
+}
+
+func NewMockAPI() *MockAPI <span class="cov0" title="0">{
+        mock := &amp;MockAPI{}
+        mock.server = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) </span><span class="cov0" title="0">{
+                switch r.URL.Path </span>{
+                case "/v1/images/search":<span class="cov0" title="0">
+                        w.Write([]byte(`[{"url": "http://example.com/cat.jpg"}]`))</span>
+                case "/v1/breeds":<span class="cov0" title="0">
+                        w.Write([]byte(`[{"id": "beng", "name": "Bengal"}]`))</span>
+                case "/v1/favourites":<span class="cov0" title="0">
+                        w.Write([]byte(`{"id": 123, "message": "Success"}`))</span>
+                case "/v1/votes":<span class="cov0" title="0">
+                        w.Write([]byte(`{"message": "SUCCESS"}`))</span>
+                default:<span class="cov0" title="0">
+                        w.WriteHeader(http.StatusNotFound)</span>
+                }
+        }))
+        <span class="cov0" title="0">return mock</span>
+}
+
+func (m *MockAPI) URL() string <span class="cov0" title="0">{
+        return m.server.URL
+}</span>
+
+func (m *MockAPI) Close() <span class="cov0" title="0">{
+        m.server.Close()
+}</span>
+</pre>
+		
+		<pre class="file" id="file7" style="display: none">package utils
+
+import (
+        "bytes"
+        "io/ioutil"
+        "net/http"
+        "time"
+)
+
+type APIResponse struct {
+        Body  []byte
+        Error error
+}
+
+var MakeAPIRequest = func(method, url string, body []byte, apiKey string) chan APIResponse <span class="cov8" title="1">{
+        responseChan := make(chan APIResponse, 1)
+        go func() </span><span class="cov8" title="1">{
+                req, err := http.NewRequest(method, url, bytes.NewBuffer(body))
+                if err != nil </span><span class="cov0" title="0">{
+                        responseChan &lt;- APIResponse{Error: err}
+                        return
+                }</span>
+                <span class="cov8" title="1">req.Header.Set("x-api-key", apiKey)
+                // Add content type header for JSON
+                req.Header.Set("Content-Type", "application/json")
+
+                client := &amp;http.Client{Timeout: 10 * time.Second}
+                resp, err := client.Do(req)
+                if err != nil </span><span class="cov0" title="0">{
+                        responseChan &lt;- APIResponse{Error: err}
+                        return
+                }</span>
+                <span class="cov8" title="1">defer resp.Body.Close()
+                responseBody, err := ioutil.ReadAll(resp.Body)
+                if err != nil </span><span class="cov0" title="0">{
+                        responseChan &lt;- APIResponse{Error: err}
+                        return
+                }</span>
+                <span class="cov8" title="1">responseChan &lt;- APIResponse{Body: responseBody}</span>
+        }()
+        <span class="cov8" title="1">return responseChan</span>
+}
+</pre>
+		
+		</div>
+	</body>
+	<script>
+	(function() {
+		var files = document.getElementById('files');
+		var visible;
+		files.addEventListener('change', onChange, false);
+		function select(part) {
+			if (visible)
+				visible.style.display = 'none';
+			visible = document.getElementById(part);
+			if (!visible)
+				return;
+			files.value = part;
+			visible.style.display = 'block';
+			location.hash = part;
+		}
+		function onChange() {
+			select(files.value);
+			window.scrollTo(0, 0);
+		}
+		if (location.hash != "") {
+			select(location.hash.substr(1));
+		}
+		if (!visible) {
+			select("file0");
+		}
+	})();
+	</script>
+</html>

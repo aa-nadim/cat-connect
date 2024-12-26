@@ -1,0 +1,21 @@
+go test ./... -coverprofile=coverage.out
+
+# Display total coverage percentage
+go tool cover -func=coverage.out | grep total: | awk '{print $3}'
+
+# Generate HTML coverage report (optional)
+go tool cover -html=coverage.out -o coverage.html
+
+# Open the HTML report (optional)
+open coverage.html
+
+
+ go clean -testcache
+ go test -v ./tests 
+
+ step 1:  go test -coverprofile coverage.out ./...
+ step 2:  go tool cover -html coverage.out        
+
+ other:
+ go test -coverprofile=coverage.out ./...
+go tool cover -html=coverage.out
