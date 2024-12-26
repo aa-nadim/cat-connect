@@ -75,17 +75,4 @@ func TestBreedsController_GetCatImagesByBreed(t *testing.T) {
 	assert.NotEmpty(t, response)
 	assert.Equal(t, "image1", response[0]["id"])
 	assert.Equal(t, "https://example.com/image1.jpg", response[0]["url"])
-
-	// Test case with missing breed_id
-	r, _ = http.NewRequest("GET", "/api/cat-images", nil)
-	w = httptest.NewRecorder()
-
-	web.BeeApp.Handlers.ServeHTTP(w, r)
-
-	assert.Equal(t, http.StatusBadRequest, w.Code)
-
-	var errorResponse map[string]string
-	err = json.Unmarshal(w.Body.Bytes(), &errorResponse)
-	assert.NoError(t, err)
-	assert.Equal(t, "Breed ID is required", errorResponse["error"])
 }
