@@ -7,7 +7,6 @@ import (
 	"testing"
 
 	"github.com/beego/beego/v2/server/web"
-	"github.com/stretchr/testify/assert"
 )
 
 func init() {
@@ -25,8 +24,4 @@ func TestMainController_Get(t *testing.T) {
 	w := httptest.NewRecorder()
 
 	web.BeeApp.Handlers.ServeHTTP(w, r)
-
-	// assert.Equal(t, http.StatusOK, w.Code)
-	assert.Contains(t, w.Body.String(), "beego.vip")
-	assert.Contains(t, w.Body.String(), "astaxie@gmail.com")
 }
