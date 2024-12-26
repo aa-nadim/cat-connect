@@ -91,10 +91,13 @@ Before you begin, ensure you have met the following requirements:
 ## Unit Tests
 
 ```bash
+# Run unit tests with coverage
 go test ./... -coverprofile=coverage.out
+
 # Display total coverage percentage
 go tool cover -func=coverage.out | grep total: | awk '{print $3}'
 
+# Generate an HTML coverage report
 go tool cover -html=coverage.out -o coverage.html
 open coverage.html
 
