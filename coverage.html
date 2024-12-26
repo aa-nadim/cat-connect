@@ -61,7 +61,7 @@
 				
 				<option value="file2">cat-connect/controllers/favorites_controller.go (86.7%)</option>
 				
-				<option value="file3">cat-connect/controllers/votes_controller.go (72.4%)</option>
+				<option value="file3">cat-connect/controllers/votes_controller.go (86.7%)</option>
 				
 				<option value="file4">cat-connect/main.go (0.0%)</option>
 				
@@ -289,14 +289,14 @@ func (c *VotesController) GetCatImages() <span class="cov8" title="1">{
                         c.Data["json"] = map[string]string{"error": response.Error.Error()}
                 }</span> else<span class="cov8" title="1"> {
                         var catImages []models.CatImage
-                        if err := json.Unmarshal(response.Body, &amp;catImages); err != nil </span><span class="cov0" title="0">{
+                        if err := json.Unmarshal(response.Body, &amp;catImages); err != nil </span><span class="cov8" title="1">{
                                 c.Ctx.Output.SetStatus(500)
                                 c.Data["json"] = map[string]string{"error": fmt.Sprintf("Error parsing cat images: %v", err)}
                         }</span> else<span class="cov8" title="1"> {
                                 c.Data["json"] = catImages
                         }</span>
                 }
-        case &lt;-time.After(15 * time.Second):<span class="cov0" title="0">
+        case &lt;-time.After(15 * time.Second):<span class="cov8" title="1">
                 c.Ctx.Output.SetStatus(504)
                 c.Data["json"] = map[string]string{"error": "Request timed out"}</span>
         }
@@ -310,7 +310,7 @@ func (c *VotesController) AddFavorite() <span class="cov8" title="1">{
         fmt.Printf("Using API key: %s\n", "****"+apiKey[len(apiKey)-4:])
 
         body, err := ioutil.ReadAll(c.Ctx.Request.Body)
-        if err != nil </span><span class="cov0" title="0">{
+        if err != nil </span><span class="cov8" title="1">{
                 c.Ctx.Output.SetStatus(400)
                 c.Data["json"] = map[string]string{"error": fmt.Sprintf("Error reading request body: %v", err)}
                 c.ServeJSON()
@@ -364,7 +364,7 @@ func (c *VotesController) AddFavorite() <span class="cov8" title="1">{
                                         ID      int    `json:"id"`
                                         Message string `json:"message"`
                                 }
-                                if err := json.Unmarshal(response.Body, &amp;favoriteResponse); err != nil </span><span class="cov0" title="0">{
+                                if err := json.Unmarshal(response.Body, &amp;favoriteResponse); err != nil </span><span class="cov8" title="1">{
                                         fmt.Printf("Error parsing response: %v\n", err)
                                         c.Ctx.Output.SetStatus(500)
                                         c.Data["json"] = map[string]string{"error": fmt.Sprintf("Failed to parse API response: %v", err)}
@@ -409,7 +409,7 @@ func (c *VotesController) Vote() <span class="cov8" title="1">{
 
         select </span>{
         case response := &lt;-responseChan:<span class="cov8" title="1">
-                if response.Error != nil </span><span class="cov0" title="0">{
+                if response.Error != nil </span><span class="cov8" title="1">{
                         // Handle API error
                         c.Ctx.Output.SetStatus(500)
                         c.Data["json"] = map[string]string{"error": response.Error.Error()}

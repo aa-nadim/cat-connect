@@ -3,6 +3,7 @@ package controllers
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -23,6 +24,12 @@ func init() {
 	web.Router("/api/votes", &controllers.VotesController{}, "post:Vote")
 	web.Router("/api/favorites", &controllers.VotesController{}, "post:AddFavorite")
 	web.Router("/api/votes", &controllers.VotesController{}, "get:GetVotes")
+}
+
+type errorReader struct{}
+
+func (er *errorReader) Read(p []byte) (n int, err error) {
+	return 0, fmt.Errorf("simulated read error")
 }
 
 func TestVotesController_GetCatImages(t *testing.T) {
@@ -68,6 +75,48 @@ func TestVotesController_GetCatImages(t *testing.T) {
 		web.BeeApp.Handlers.ServeHTTP(w, r)
 
 		// assert.Equal(t, http.StatusMethodNotAllowed, w.Code)
+	})
+
+	t.Run("JSON Unmarshal Error", func(t *testing.T) {
+		originalMakeAPIRequest := utils.MakeAPIRequest
+		defer func() { utils.MakeAPIRequest = originalMakeAPIRequest }()
+		utils.MakeAPIRequest = func(method, url string, body []byte, apiKey string) chan utils.APIResponse {
+			responseChan := make(chan utils.APIResponse, 1)
+			responseChan <- utils.APIResponse{
+				Body: []byte(`invalid json`), // Invalid JSON response
+			}
+			return responseChan
+		}
+
+		r, _ := http.NewRequest("GET", "/api/cat-images", nil)
+		w := httptest.NewRecorder()
+
+		web.BeeApp.Handlers.ServeHTTP(w, r)
+
+		assert.Equal(t, http.StatusInternalServerError, w.Code)
+		var response map[string]string
+		err := json.Unmarshal(w.Body.Bytes(), &response)
+		assert.NoError(t, err)
+		assert.Contains(t, response["error"], "Error parsing cat images")
+	})
+
+	t.Run("Timeout Response", func(t *testing.T) {
+		originalMakeAPIRequest := utils.MakeAPIRequest
+		defer func() { utils.MakeAPIRequest = originalMakeAPIRequest }()
+		utils.MakeAPIRequest = func(method, url string, body []byte, apiKey string) chan utils.APIResponse {
+			return make(chan utils.APIResponse) // Empty channel to simulate timeout
+		}
+
+		r, _ := http.NewRequest("GET", "/api/cat-images", nil)
+		w := httptest.NewRecorder()
+
+		web.BeeApp.Handlers.ServeHTTP(w, r)
+
+		assert.Equal(t, http.StatusGatewayTimeout, w.Code)
+		var response map[string]string
+		err := json.Unmarshal(w.Body.Bytes(), &response)
+		assert.NoError(t, err)
+		assert.Equal(t, "Request timed out", response["error"])
 	})
 }
 
@@ -154,6 +203,45 @@ func TestVotesController_AddFavorite(t *testing.T) {
 		w := httptest.NewRecorder()
 
 		web.BeeApp.Handlers.ServeHTTP(w, r)
+	})
+
+	t.Run("Error Reading Request Body", func(t *testing.T) {
+		// Create a request with a body that will cause a read error
+		r, _ := http.NewRequest("POST", "/api/favorites", &errorReader{})
+		w := httptest.NewRecorder()
+
+		web.BeeApp.Handlers.ServeHTTP(w, r)
+
+		assert.Equal(t, http.StatusBadRequest, w.Code)
+		var response map[string]string
+		err := json.Unmarshal(w.Body.Bytes(), &response)
+		assert.NoError(t, err)
+		assert.Contains(t, response["error"], "Error reading request body")
+	})
+
+	t.Run("Invalid API Response", func(t *testing.T) {
+		body, _ := json.Marshal(favorite)
+		r, _ := http.NewRequest("POST", "/api/favorites", bytes.NewBuffer(body))
+		w := httptest.NewRecorder()
+
+		// Mock invalid API response
+		originalMakeAPIRequest := utils.MakeAPIRequest
+		defer func() { utils.MakeAPIRequest = originalMakeAPIRequest }()
+		utils.MakeAPIRequest = func(method, url string, body []byte, apiKey string) chan utils.APIResponse {
+			responseChan := make(chan utils.APIResponse, 1)
+			responseChan <- utils.APIResponse{
+				Body: []byte(`invalid json`),
+			}
+			return responseChan
+		}
+
+		web.BeeApp.Handlers.ServeHTTP(w, r)
+
+		assert.Equal(t, http.StatusInternalServerError, w.Code)
+		var response map[string]string
+		err := json.Unmarshal(w.Body.Bytes(), &response)
+		assert.NoError(t, err)
+		assert.Contains(t, response["error"], "Failed to parse API response")
 	})
 }
 
@@ -281,6 +369,31 @@ func TestVotesController_Vote(t *testing.T) {
 		web.BeeApp.Handlers.ServeHTTP(w, r)
 
 		// assert.Equal(t, http.StatusGatewayTimeout, w.Code) // Expecting Gateway Timeout error (504)
+	})
+
+	t.Run("API Error Response", func(t *testing.T) {
+		body, _ := json.Marshal(vote)
+		r, _ := http.NewRequest("POST", "/api/votes", bytes.NewBuffer(body))
+		w := httptest.NewRecorder()
+
+		// Mock API error response
+		originalMakeAPIRequest := utils.MakeAPIRequest
+		defer func() { utils.MakeAPIRequest = originalMakeAPIRequest }()
+		utils.MakeAPIRequest = func(method, url string, body []byte, apiKey string) chan utils.APIResponse {
+			responseChan := make(chan utils.APIResponse, 1)
+			responseChan <- utils.APIResponse{
+				Error: fmt.Errorf("API error"),
+			}
+			return responseChan
+		}
+
+		web.BeeApp.Handlers.ServeHTTP(w, r)
+
+		assert.Equal(t, http.StatusInternalServerError, w.Code)
+		var response map[string]string
+		err := json.Unmarshal(w.Body.Bytes(), &response)
+		assert.NoError(t, err)
+		assert.Equal(t, "API error", response["error"])
 	})
 }
 
