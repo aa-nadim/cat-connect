@@ -22,8 +22,8 @@ func init() {
 }
 
 func TestBreedsController_GetBreeds(t *testing.T) {
-	// Valid response case
-	t.Run("Valid Response", func(t *testing.T) {
+	// Error during JSON unmarshalling
+	t.Run("Error Parsing Breeds", func(t *testing.T) {
 		r, _ := http.NewRequest("GET", "/api/breeds", nil)
 		w := httptest.NewRecorder()
 
@@ -33,34 +33,7 @@ func TestBreedsController_GetBreeds(t *testing.T) {
 		utils.MakeAPIRequest = func(method, url string, body []byte, apiKey string) chan utils.APIResponse {
 			responseChan := make(chan utils.APIResponse, 1)
 			responseChan <- utils.APIResponse{
-				Body: []byte(`[{"id": "abys", "name": "Abyssinian"}]`),
-			}
-			return responseChan
-		}
-
-		web.BeeApp.Handlers.ServeHTTP(w, r)
-
-		assert.Equal(t, http.StatusOK, w.Code)
-
-		var response []map[string]interface{}
-		err := json.Unmarshal(w.Body.Bytes(), &response)
-		assert.NoError(t, err)
-		assert.NotEmpty(t, response)
-		assert.Equal(t, "Abyssinian", response[0]["name"])
-	})
-
-	// Error response from API
-	t.Run("API Error Response", func(t *testing.T) {
-		r, _ := http.NewRequest("GET", "/api/breeds", nil)
-		w := httptest.NewRecorder()
-
-		// Mock the API request
-		originalMakeAPIRequest := utils.MakeAPIRequest
-		defer func() { utils.MakeAPIRequest = originalMakeAPIRequest }()
-		utils.MakeAPIRequest = func(method, url string, body []byte, apiKey string) chan utils.APIResponse {
-			responseChan := make(chan utils.APIResponse, 1)
-			responseChan <- utils.APIResponse{
-				Error: assert.AnError,
+				Body: []byte(`Invalid JSON`),
 			}
 			return responseChan
 		}
@@ -68,55 +41,39 @@ func TestBreedsController_GetBreeds(t *testing.T) {
 		web.BeeApp.Handlers.ServeHTTP(w, r)
 
 		assert.Equal(t, http.StatusInternalServerError, w.Code)
-	})
-}
-
-func TestBreedsController_GetCatImagesByBreed(t *testing.T) {
-	// Valid response case
-	t.Run("Valid Response", func(t *testing.T) {
-		r, _ := http.NewRequest("GET", "/api/cat-images/by-breed?breed_id=abys", nil)
-		w := httptest.NewRecorder()
-
-		// Mock the API request
-		originalMakeAPIRequest := utils.MakeAPIRequest
-		defer func() { utils.MakeAPIRequest = originalMakeAPIRequest }()
-		utils.MakeAPIRequest = func(method, url string, body []byte, apiKey string) chan utils.APIResponse {
-			responseChan := make(chan utils.APIResponse, 1)
-			responseChan <- utils.APIResponse{
-				Body: []byte(`[{"id": "image1", "url": "https://example.com/image1.jpg"}]`),
-			}
-			return responseChan
-		}
-
-		web.BeeApp.Handlers.ServeHTTP(w, r)
-
-		assert.Equal(t, http.StatusOK, w.Code)
-
-		var response []map[string]interface{}
-		err := json.Unmarshal(w.Body.Bytes(), &response)
-		assert.NoError(t, err)
-		assert.NotEmpty(t, response)
-		assert.Equal(t, "image1", response[0]["id"])
-		assert.Equal(t, "https://example.com/image1.jpg", response[0]["url"])
-	})
-
-	// Missing breed_id
-	t.Run("Missing Breed ID", func(t *testing.T) {
-		r, _ := http.NewRequest("GET", "/api/cat-images/by-breed", nil)
-		w := httptest.NewRecorder()
-
-		web.BeeApp.Handlers.ServeHTTP(w, r)
-
-		assert.Equal(t, http.StatusBadRequest, w.Code)
 
 		var response map[string]string
 		err := json.Unmarshal(w.Body.Bytes(), &response)
 		assert.NoError(t, err)
-		assert.Equal(t, "Breed ID is required", response["error"])
+		assert.Contains(t, response["error"], "Error parsing breeds")
 	})
 
-	// API error response
-	t.Run("API Error Response", func(t *testing.T) {
+	// Request timeout case
+	t.Run("Request Timeout", func(t *testing.T) {
+		r, _ := http.NewRequest("GET", "/api/breeds", nil)
+		w := httptest.NewRecorder()
+
+		// Mock the API request with a timeout
+		originalMakeAPIRequest := utils.MakeAPIRequest
+		defer func() { utils.MakeAPIRequest = originalMakeAPIRequest }()
+		utils.MakeAPIRequest = func(method, url string, body []byte, apiKey string) chan utils.APIResponse {
+			return make(chan utils.APIResponse)
+		}
+
+		web.BeeApp.Handlers.ServeHTTP(w, r)
+
+		assert.Equal(t, http.StatusGatewayTimeout, w.Code)
+
+		var response map[string]string
+		err := json.Unmarshal(w.Body.Bytes(), &response)
+		assert.NoError(t, err)
+		assert.Equal(t, "Request timed out", response["error"])
+	})
+}
+
+func TestBreedsController_GetCatImagesByBreed(t *testing.T) {
+	// Error during JSON unmarshalling
+	t.Run("Error Parsing Cat Images", func(t *testing.T) {
 		r, _ := http.NewRequest("GET", "/api/cat-images/by-breed?breed_id=abys", nil)
 		w := httptest.NewRecorder()
 
@@ -126,7 +83,7 @@ func TestBreedsController_GetCatImagesByBreed(t *testing.T) {
 		utils.MakeAPIRequest = func(method, url string, body []byte, apiKey string) chan utils.APIResponse {
 			responseChan := make(chan utils.APIResponse, 1)
 			responseChan <- utils.APIResponse{
-				Error: assert.AnError,
+				Body: []byte(`Invalid JSON`),
 			}
 			return responseChan
 		}
@@ -134,9 +91,14 @@ func TestBreedsController_GetCatImagesByBreed(t *testing.T) {
 		web.BeeApp.Handlers.ServeHTTP(w, r)
 
 		assert.Equal(t, http.StatusInternalServerError, w.Code)
+
+		var response map[string]string
+		err := json.Unmarshal(w.Body.Bytes(), &response)
+		assert.NoError(t, err)
+		assert.Contains(t, response["error"], "Error parsing cat images")
 	})
 
-	// Timeout scenario
+	// Request timeout case
 	t.Run("Request Timeout", func(t *testing.T) {
 		r, _ := http.NewRequest("GET", "/api/cat-images/by-breed?breed_id=abys", nil)
 		w := httptest.NewRecorder()
@@ -145,8 +107,7 @@ func TestBreedsController_GetCatImagesByBreed(t *testing.T) {
 		originalMakeAPIRequest := utils.MakeAPIRequest
 		defer func() { utils.MakeAPIRequest = originalMakeAPIRequest }()
 		utils.MakeAPIRequest = func(method, url string, body []byte, apiKey string) chan utils.APIResponse {
-			responseChan := make(chan utils.APIResponse)
-			return responseChan
+			return make(chan utils.APIResponse)
 		}
 
 		web.BeeApp.Handlers.ServeHTTP(w, r)

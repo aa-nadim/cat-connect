@@ -55,7 +55,7 @@
 			<div id="nav">
 				<select id="files">
 				
-				<option value="file0">cat-connect/controllers/breeds_controller.go (82.9%)</option>
+				<option value="file0">cat-connect/controllers/breeds_controller.go (85.7%)</option>
 				
 				<option value="file1">cat-connect/controllers/default.go (100.0%)</option>
 				
@@ -104,12 +104,12 @@ func (c *BreedsController) GetBreeds() <span class="cov8" title="1">{
 
         select </span>{
         case response := &lt;-responseChan:<span class="cov8" title="1">
-                if response.Error != nil </span><span class="cov8" title="1">{
+                if response.Error != nil </span><span class="cov0" title="0">{
                         c.Ctx.Output.SetStatus(500)
                         c.Data["json"] = map[string]string{"error": response.Error.Error()}
                 }</span> else<span class="cov8" title="1"> {
                         var breeds []models.Breed
-                        if err := json.Unmarshal(response.Body, &amp;breeds); err != nil </span><span class="cov0" title="0">{
+                        if err := json.Unmarshal(response.Body, &amp;breeds); err != nil </span><span class="cov8" title="1">{
                                 c.Ctx.Output.SetStatus(500)
                                 c.Data["json"] = map[string]string{"error": fmt.Sprintf("Error parsing breeds: %v", err)}
                         }</span> else<span class="cov8" title="1"> {
@@ -118,7 +118,7 @@ func (c *BreedsController) GetBreeds() <span class="cov8" title="1">{
                                 c.Data["json"] = breeds
                         }</span>
                 }
-        case &lt;-time.After(15 * time.Second):<span class="cov0" title="0">
+        case &lt;-time.After(15 * time.Second):<span class="cov8" title="1">
                 c.Ctx.Output.SetStatus(504)
                 c.Data["json"] = map[string]string{"error": "Request timed out"}</span>
         }
@@ -142,15 +142,15 @@ func (c *BreedsController) GetCatImagesByBreed() <span class="cov8" title="1">{
 
         select </span>{
         case response := &lt;-responseChan:<span class="cov8" title="1">
-                if response.Error != nil </span><span class="cov8" title="1">{
+                if response.Error != nil </span><span class="cov0" title="0">{
                         c.Ctx.Output.SetStatus(500)
                         c.Data["json"] = map[string]string{"error": response.Error.Error()}
                 }</span> else<span class="cov8" title="1"> {
                         var catImages []map[string]interface{}
-                        if err := json.Unmarshal(response.Body, &amp;catImages); err != nil </span><span class="cov0" title="0">{
+                        if err := json.Unmarshal(response.Body, &amp;catImages); err != nil </span><span class="cov8" title="1">{
                                 c.Ctx.Output.SetStatus(500)
                                 c.Data["json"] = map[string]string{"error": fmt.Sprintf("Error parsing cat images: %v", err)}
-                        }</span> else<span class="cov8" title="1"> {
+                        }</span> else<span class="cov0" title="0"> {
                                 c.Data["json"] = catImages
                         }</span>
                 }
