@@ -22,43 +22,43 @@ func init() {
 	web.Router("/api/cat-images", &controllers.VotesController{}, "get:GetCatImages")
 	web.Router("/api/votes", &controllers.VotesController{}, "post:Vote")
 	web.Router("/api/favorites", &controllers.VotesController{}, "post:AddFavorite")
-
 	web.Router("/api/votes", &controllers.VotesController{}, "get:GetVotes")
 }
 
 func TestVotesController_GetCatImages(t *testing.T) {
-	r, _ := http.NewRequest("GET", "/api/cat-images", nil)
-	w := httptest.NewRecorder()
+	t.Run("Successful Response", func(t *testing.T) {
+		r, _ := http.NewRequest("GET", "/api/cat-images", nil)
+		w := httptest.NewRecorder()
 
-	web.BeeApp.Handlers.ServeHTTP(w, r)
+		web.BeeApp.Handlers.ServeHTTP(w, r)
 
-	assert.Equal(t, http.StatusOK, w.Code)
+		assert.Equal(t, http.StatusOK, w.Code)
 
-	var response []models.CatImage
-	err := json.Unmarshal(w.Body.Bytes(), &response)
-	assert.NoError(t, err)
-	assert.NotEmpty(t, response)
-}
+		var response []models.CatImage
+		err := json.Unmarshal(w.Body.Bytes(), &response)
+		assert.NoError(t, err)
+		assert.NotEmpty(t, response)
+	})
 
-func TestVotesController_GetCatImages_Error(t *testing.T) {
-	r, _ := http.NewRequest("GET", "/api/cat-images", nil)
-	w := httptest.NewRecorder()
-
-	// Mock the API request to return an error
-	originalMakeAPIRequest := utils.MakeAPIRequest
-	defer func() { utils.MakeAPIRequest = originalMakeAPIRequest }()
-	utils.MakeAPIRequest = func(method, url string, body []byte, apiKey string) chan utils.APIResponse {
-		responseChan := make(chan utils.APIResponse, 1)
-		responseChan <- utils.APIResponse{
-			Error: http.ErrServerClosed,
+	t.Run("Error Response", func(t *testing.T) {
+		// Simulating an error scenario (like DB failure or other unexpected issues)
+		originalMakeAPIRequest := utils.MakeAPIRequest
+		defer func() { utils.MakeAPIRequest = originalMakeAPIRequest }()
+		utils.MakeAPIRequest = func(method, url string, body []byte, apiKey string) chan utils.APIResponse {
+			responseChan := make(chan utils.APIResponse, 1)
+			responseChan <- utils.APIResponse{
+				Error: http.ErrServerClosed,
+			}
+			return responseChan
 		}
-		return responseChan
-	}
 
-	web.BeeApp.Handlers.ServeHTTP(w, r)
+		r, _ := http.NewRequest("GET", "/api/cat-images", nil)
+		w := httptest.NewRecorder()
 
-	assert.Equal(t, http.StatusInternalServerError, w.Code)
-	t.Logf("Response Code: %d, Body: %s", w.Code, w.Body.String())
+		web.BeeApp.Handlers.ServeHTTP(w, r)
+
+		assert.Equal(t, http.StatusInternalServerError, w.Code)
+	})
 }
 
 func TestVotesController_Vote(t *testing.T) {
@@ -68,38 +68,51 @@ func TestVotesController_Vote(t *testing.T) {
 		Value:   1,
 	}
 
-	body, _ := json.Marshal(vote)
-	r, _ := http.NewRequest("POST", "/api/votes", bytes.NewBuffer(body))
-	w := httptest.NewRecorder()
+	t.Run("Successful Vote", func(t *testing.T) {
+		body, _ := json.Marshal(vote)
+		r, _ := http.NewRequest("POST", "/api/votes", bytes.NewBuffer(body))
+		w := httptest.NewRecorder()
 
-	web.BeeApp.Handlers.ServeHTTP(w, r)
+		web.BeeApp.Handlers.ServeHTTP(w, r)
 
-	assert.Equal(t, http.StatusOK, w.Code)
+		assert.Equal(t, http.StatusOK, w.Code)
+	})
 
-}
+	t.Run("Invalid JSON Input", func(t *testing.T) {
+		invalidBody := []byte(`invalid-json`)
+		r, _ := http.NewRequest("POST", "/api/votes", bytes.NewBuffer(invalidBody))
+		w := httptest.NewRecorder()
 
-func TestVotesController_Vote_InvalidInput(t *testing.T) {
-	r, _ := http.NewRequest("POST", "/api/votes", bytes.NewBuffer([]byte(`invalid-json`)))
-	w := httptest.NewRecorder()
+		web.BeeApp.Handlers.ServeHTTP(w, r)
 
-	web.BeeApp.Handlers.ServeHTTP(w, r)
+		assert.Equal(t, http.StatusBadRequest, w.Code) // Expecting a BadRequest error for invalid JSON
+	})
 
-	assert.Equal(t, http.StatusBadRequest, w.Code)
-	t.Logf("Response Code: %d, Body: %s", w.Code, w.Body.String())
-}
+	t.Run("Missing Required Fields (ImageID)", func(t *testing.T) {
+		invalidVote := models.Vote{
+			SubID: "test-user",
+			Value: 1,
+		} // Missing ImageID
+		body, _ := json.Marshal(invalidVote)
+		r, _ := http.NewRequest("POST", "/api/votes", bytes.NewBuffer(body))
+		w := httptest.NewRecorder()
 
-func TestVotesController_Vote_MissingFields(t *testing.T) {
-	vote := models.Vote{
-		ImageID: "test-image", // SubID is missing
-		Value:   1,
-	}
+		web.BeeApp.Handlers.ServeHTTP(w, r)
 
-	body, _ := json.Marshal(vote)
-	r, _ := http.NewRequest("POST", "/api/votes", bytes.NewBuffer(body))
-	w := httptest.NewRecorder()
+	})
 
-	web.BeeApp.Handlers.ServeHTTP(w, r)
+	t.Run("Missing Required Fields (Value)", func(t *testing.T) {
+		invalidVote := models.Vote{
+			ImageID: "test-image",
+			SubID:   "test-user",
+		} // Missing Value
+		body, _ := json.Marshal(invalidVote)
+		r, _ := http.NewRequest("POST", "/api/votes", bytes.NewBuffer(body))
+		w := httptest.NewRecorder()
 
+		web.BeeApp.Handlers.ServeHTTP(w, r)
+
+	})
 }
 
 func TestVotesController_AddFavorite(t *testing.T) {
@@ -108,59 +121,76 @@ func TestVotesController_AddFavorite(t *testing.T) {
 		SubID:   "test-user",
 	}
 
-	body, _ := json.Marshal(favorite)
-	r, _ := http.NewRequest("POST", "/api/favorites", bytes.NewBuffer(body))
-	w := httptest.NewRecorder()
+	t.Run("Successful Favorite", func(t *testing.T) {
+		body, _ := json.Marshal(favorite)
+		r, _ := http.NewRequest("POST", "/api/favorites", bytes.NewBuffer(body))
+		w := httptest.NewRecorder()
 
-	// Mock the API request
-	originalMakeAPIRequest := utils.MakeAPIRequest
-	defer func() { utils.MakeAPIRequest = originalMakeAPIRequest }()
-	utils.MakeAPIRequest = func(method, url string, body []byte, apiKey string) chan utils.APIResponse {
-		responseChan := make(chan utils.APIResponse, 1)
-		responseChan <- utils.APIResponse{
-			Body: []byte(`{"id": 123, "message": "SUCCESS"}`),
+		// Mock the API request
+		originalMakeAPIRequest := utils.MakeAPIRequest
+		defer func() { utils.MakeAPIRequest = originalMakeAPIRequest }()
+		utils.MakeAPIRequest = func(method, url string, body []byte, apiKey string) chan utils.APIResponse {
+			responseChan := make(chan utils.APIResponse, 1)
+			responseChan <- utils.APIResponse{
+				Body: []byte(`{"id": 123, "message": "SUCCESS"}`),
+			}
+			return responseChan
 		}
-		return responseChan
-	}
 
-	web.BeeApp.Handlers.ServeHTTP(w, r)
+		web.BeeApp.Handlers.ServeHTTP(w, r)
 
-	assert.Equal(t, http.StatusOK, w.Code)
+		assert.Equal(t, http.StatusOK, w.Code)
 
-	var response map[string]interface{}
-	err := json.Unmarshal(w.Body.Bytes(), &response)
-	assert.NoError(t, err)
-	assert.Equal(t, "SUCCESS", response["message"])
-	assert.Equal(t, float64(123), response["id"]) // JSON unmarshals numbers to float64 by default
-}
+		var response map[string]interface{}
+		err := json.Unmarshal(w.Body.Bytes(), &response)
+		assert.NoError(t, err)
+		assert.Equal(t, "SUCCESS", response["message"])
+		assert.Equal(t, float64(123), response["id"]) // JSON unmarshals numbers to float64 by default
+	})
 
-func TestVotesController_AddFavorite_APIFailure(t *testing.T) {
-	favorite := models.Favorite{
-		ImageID: "test-image",
-		SubID:   "test-user",
-	}
+	t.Run("Invalid JSON Input", func(t *testing.T) {
+		invalidBody := []byte(`invalid-json`)
+		r, _ := http.NewRequest("POST", "/api/favorites", bytes.NewBuffer(invalidBody))
+		w := httptest.NewRecorder()
 
-	body, _ := json.Marshal(favorite)
-	r, _ := http.NewRequest("POST", "/api/favorites", bytes.NewBuffer(body))
-	w := httptest.NewRecorder()
+		web.BeeApp.Handlers.ServeHTTP(w, r)
 
-	// Mock the API request to fail
-	originalMakeAPIRequest := utils.MakeAPIRequest
-	defer func() { utils.MakeAPIRequest = originalMakeAPIRequest }()
-	utils.MakeAPIRequest = func(method, url string, body []byte, apiKey string) chan utils.APIResponse {
-		responseChan := make(chan utils.APIResponse, 1)
-		responseChan <- utils.APIResponse{
-			Body:  []byte(`{"message": "ERROR"}`),
-			Error: http.ErrServerClosed,
+		assert.Equal(t, http.StatusBadRequest, w.Code)
+	})
+
+	t.Run("Missing Required Fields (SubID)", func(t *testing.T) {
+		invalidFavorite := models.Favorite{
+			ImageID: "test-image",
+		} // Missing SubID
+		body, _ := json.Marshal(invalidFavorite)
+		r, _ := http.NewRequest("POST", "/api/favorites", bytes.NewBuffer(body))
+		w := httptest.NewRecorder()
+
+		web.BeeApp.Handlers.ServeHTTP(w, r)
+
+		assert.Equal(t, http.StatusBadRequest, w.Code)
+	})
+
+	t.Run("Favorite Service Error", func(t *testing.T) {
+		body, _ := json.Marshal(favorite)
+		r, _ := http.NewRequest("POST", "/api/favorites", bytes.NewBuffer(body))
+		w := httptest.NewRecorder()
+
+		// Mock the API request to simulate an error
+		originalMakeAPIRequest := utils.MakeAPIRequest
+		defer func() { utils.MakeAPIRequest = originalMakeAPIRequest }()
+		utils.MakeAPIRequest = func(method, url string, body []byte, apiKey string) chan utils.APIResponse {
+			responseChan := make(chan utils.APIResponse, 1)
+			responseChan <- utils.APIResponse{
+				Error: http.ErrServerClosed,
+			}
+			return responseChan
 		}
-		return responseChan
-	}
 
-	web.BeeApp.Handlers.ServeHTTP(w, r)
+		web.BeeApp.Handlers.ServeHTTP(w, r)
 
-	assert.Equal(t, http.StatusInternalServerError, w.Code)
-	t.Logf("Response Code: %d, Body: %s", w.Code, w.Body.String())
-
+		assert.Equal(t, http.StatusInternalServerError, w.Code)
+	})
 }
 
 func TestVotesController_GetVotes(t *testing.T) {
@@ -227,5 +257,15 @@ func TestVotesController_GetVotes(t *testing.T) {
 		err := json.Unmarshal(w.Body.Bytes(), &response)
 		assert.NoError(t, err)
 		assert.Equal(t, "Request timed out", response["error"])
+	})
+
+	t.Run("Invalid Query Parameters", func(t *testing.T) {
+		// Passing invalid parameters to see how the endpoint responds
+		url := "/api/votes?limit=not-a-number&order=unknown-order&sub_id=" + subID + "&page=-1"
+		r, _ := http.NewRequest("GET", url, nil)
+		w := httptest.NewRecorder()
+
+		web.BeeApp.Handlers.ServeHTTP(w, r)
+
 	})
 }
