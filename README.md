@@ -93,6 +93,7 @@ Before you begin, ensure you have met the following requirements:
 ```bash
 go test ./tests/controllers/breeds_controller_test.go
 go test ./tests/controllers/favorites_controller_test.go
+go test ./tests/controllers/votes_controller_test.go
 
 go test ./tests/...
 go test -v ./tests/...
